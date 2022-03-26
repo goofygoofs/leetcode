@@ -57,14 +57,11 @@ class Solution:
         divisor = 1 # 1=>10 ~~~ 100 ~~~ 1=>10
         # find order of input x
         while (x / divisor >= 10): # 121/1 => 121/10 = 12.1 => 1.21 ~~~ didn't go in because negative ~~~ 10/1 
-            print('local x/divisor', x/divisor)
             divisor *= 10
-            print('here divisor', divisor)
         
         while (x != 0): #121 ... 2 ~~~ -121 ~~~ 10
             leading = x // divisor #121//100 =>1.21=>1.00 ... 2//1 => 2 ~~~ -121 // 1 => -121 ~~~ 10 // 10 => 1
             trailing = x % 10 #121 %10 =>12.1=> 1.00  ... 2 % 10 => 2 ~~~ -121 % 10 => -13 with 9 remainder => 9 ~~~ 10 % 10 => 0
-            print('leading', leading, 'trailing', trailing)
 
             # if first and last digit are not the same return false
             if (leading != trailing):
@@ -73,15 +70,15 @@ class Solution:
 
             # removing the leading and trailing digit from the number
             x = (x % divisor) // 10 # 121%100=> 21 // 10 => 2.1 => 2 ... 2 % 1 => 0
-            print('x', x)
 
             # reducing divisor by a factor of 2 as 2 digits are dropped
             divisor = divisor / 100 # 1
-            print('divisor', divisor)
 
         
 
         return True
+        # O(log(n)) time while loop divide input by 10 for each iteration
+        # space O(1)
 
 
 
