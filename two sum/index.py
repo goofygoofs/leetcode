@@ -63,4 +63,5 @@ print(output)
 output = solution.twoSum([3,3], 66)
 print(output)
 
-# o(n) it is 1 time pass through, we're using the dictionary which has linear time lookup
+# o(n) it is 1 time pass through, we're looping through the list which is o(n). lookup on hash table is o(1)
+# o(n) space because of hash table
