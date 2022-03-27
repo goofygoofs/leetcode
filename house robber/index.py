@@ -100,13 +100,13 @@ space O(1)
 from typing import List
 class Solution:
     def rob(self, nums: List[int]) -> int:
-        robFromFirst, robFromSecond = 0, 0  #[rob1, rob2, n, n+1, ...]
+        prevPrevRobbed, prevRobbed = 0, 0  #[rob1, rob2, n, n+1, ...]
 
-        for money in nums: #[2,1,1,2,1,1,2,100]
-            temp = max(money + robFromFirst, robFromSecond) #(2+0,0)... (1+0,2)... (1+2, 2)
-            robFromFirst = robFromSecond # 0...2...2
-            robFromSecond = temp # 2...2...3
-        return robFromSecond
+        for currRobbed in nums: #[2,1,1,100]
+            highestRobbedSoFar = max(currRobbed + prevPrevRobbed, prevRobbed) #(2+0,0)... (1+0,2)... (1+2, 2)
+            prevPrevRobbed = prevRobbed # 0...2...2
+            prevRobbed = highestRobbedSoFar # 2...2...3
+        return currRobbed
     
 
 
