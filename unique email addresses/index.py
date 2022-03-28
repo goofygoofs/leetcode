@@ -71,9 +71,8 @@ class Email:
         
     # removes after + sign in localName, strips periods in localName
     def cleanse(self, email: str) -> str:
-        local, domain = self.cutAt(email, '@')
-        cleansedLocal, _stuffAfterPlus = self.cutAt(local, "+")
-        return cleansedLocal.replace(".", "") + '@' + domain 
+        cleansedLocal, _stuffAfterPlus = self.cutAt(self.localName, "+")
+        return cleansedLocal.replace(".", "") + '@' + self.domainName 
 
 class Solution:
     def numUniqueEmails(self, emails: List[str]) -> int:
@@ -89,10 +88,10 @@ class Solution:
 # O(n) space because of set, copying str
 
 
-sol = Solution()
+# sol = Solution()
 
-output = sol.numUniqueEmails(["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"])
-print(output)
+# output = sol.numUniqueEmails(["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"])
+# print(output)
 
-output = sol.numUniqueEmails(["a@leetcode.com","b@leetcode.com","c@leetcode.com"])
-print(output)
+# output = sol.numUniqueEmails(["a@leetcode.com","b@leetcode.com","c@leetcode.com"])
+# print(output)
