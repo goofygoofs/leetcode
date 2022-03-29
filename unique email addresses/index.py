@@ -53,6 +53,38 @@ look through the emails, apply the functions, we will put that into a set becaus
 more efficient of beautiful?
 make email a class?
 '''
+
+'''
+so basically these two email addresses below the local name in the first one has a period in it
+and the second one does not have a period but remember we were told that period symbols in the local name
+can be ignored so basically this email address is the exact same.
+if we were given a list of 2 email address "alice.z@leetcode.com" and "alicez@leetcode.com"
+we would return 1 because there is only 1 unique email
+if there's a plus symbol everything after it can be ignored, including the plus symbol.
+so we are left with m.y, and remember periods are ignored so we are left with just "my@email.com"
+how can we actually count the number of unique email addresses? we are going through each email and apply the plus and dot rule
+local name is going to be simplied, while domain is the name. we are going to store it in a hash set./
+why hash set? because hash set is going to eliminate duplicated. each email will be stored in O(1) time and n emails
+so O(n) time complexity. actually going through each email and doing the cleansing will be O(n*m)
+
+first we're creating the hash set and then go through each email. there's a lot of ways to do this and there's a lot of built in stuff
+we can split the string into 2 string. local needs to be simplied. remove periods and anything after plus and the plus sign
+for split we want to split the first occurence and take whatever comes before the plus
+in python there's builtin for strings called replace and basically erasing every occurence of period.
+then we wanna add it to the set. you can add tuple (local, domain) into the set
+you can consider it cheating as you use builtin
+
+now for each email you have to iterate through each character. 
+i, local = 0, ""
+we are going character by character in this local string then when we reach "@" or "+" we can build the local string
+while email[i] not in ["@", "+"]:
+    if e[i] != "."
+        local += e[i]
+last part is to get domain. we want to keep iterating until we reach @ symbol.
+while e[i] != "@":
+    i+= 1
+domain = e[i+1:] 
+'''
 from typing import Tuple, List
 class Email:
     def __init__(self, email):
@@ -63,7 +95,7 @@ class Email:
     #cuts at the character. returns both sides of character, if any
     def cutAt(self, email: str, char: str) -> Tuple:
         beforeChar, afterChar = "", ""
-        emailSplitted = email.split(char, 1)
+        emailSplitted = email.split(char, 1) # split the first character. only 1 "@" and we wanna split the first "+"
         beforeChar = emailSplitted[0]
         if len(emailSplitted) > 1:
             afterChar = emailSplitted[1]
@@ -84,7 +116,7 @@ class Solution:
         
         return len(uniqueEmails)
 
-# O(n) going through emails, split  -> actually it is O(a) with a being number of characters in longest localDomain
+# O(n) going through emails, split  -> actually it is O(n * m) with n being # of emails and m being # of characters on average of each email
 # O(n) space because of set, copying str
 
 
