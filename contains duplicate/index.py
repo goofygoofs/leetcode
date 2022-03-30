@@ -30,6 +30,17 @@ O(n) time complexity still because looping through nums. but can exit early if d
 so O(n - k)
 O(n - k) space complexity too depending on how early dup is found
 '''
+
+'''
+brute force is O(n^2) comparing each number . this approach would be O(1) space since we do use any extra space
+
+another way is sorting and iterating through the array once. and checking neighbors and shifting pointers. sorting takes extra time so it's O(nlogn). but we don't need extra space if you don't count space by sorting algo.
+
+if we don't sort, we use extra memory - we use a hash set. we can insert into hash set in O(1) time and lookup in O(1) time
+
+best case is using hash set and time and space complexity is O(n).
+ 
+ '''
 from typing import List
 class Solution:
     def containsDuplicate(self, nums: List[int]) -> bool:
