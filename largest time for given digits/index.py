@@ -37,6 +37,8 @@ beautify?
 maybe make time property a class and update it's properties if the length of output isnt 5
 we run maximum of 3 time if failing. with first index being max number of 2, 1, 0. 
 make code into a function for re-calling if failed.
+O(1) time complexity since we know only 4 digits
+O(1) space since we know only 4 digits
 '''
 from typing import List
 class Solution:
