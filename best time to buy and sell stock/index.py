@@ -54,7 +54,7 @@ class Solution:
         for i, price in enumerate(prices):
             leftValue = prices[leftPointer]
             rightValue = prices[rightPointer]
-            print('price', price, 'LEFT', leftValue, 'RIGHT', rightValue)
+            # print('price', price, 'LEFT', leftValue, 'RIGHT', rightValue)
 
             # check if pointer lower or higher
             if price < leftValue:
@@ -71,11 +71,11 @@ class Solution:
 
 sol = Solution()
 
-output = sol.maxProfit([7,1,5,3,6,4])
-print(output)
+# output = sol.maxProfit([7,1,5,3,6,4])
+# print(output)
 
-output = sol.maxProfit([7,6,4,3,1])
-print(output)
+# output = sol.maxProfit([7,6,4,3,1])
+# print(output)
 
-output = sol.maxProfit([10, 50, 1, 40])
-print(output)
+# output = sol.maxProfit([10, 50, 1, 40])
+# print(output)
