@@ -117,11 +117,12 @@ class Solution:
         if len(arr) == 0:
             return None
         head = ListNode(arr[0])
-        tail = head
+        
         if len(arr) == 1:
             return head
 
         i = 1
+        tail = head
 
         while i < len(arr):
             tail.next = ListNode(arr[i])
