@@ -62,8 +62,6 @@ class Solution:
         for i, num in enumerate(nums):
             if i == 0:
                 continue
-            leftValue = nums[leftPointer]
-            rightValue = nums[rightPointer]
 
             curr = prev + num
 
