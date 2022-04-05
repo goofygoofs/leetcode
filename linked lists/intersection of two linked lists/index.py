@@ -60,15 +60,48 @@ Follow up: Could you write a solution that runs in O(m + n) time and use only O(
 '''
 
 '''
-
+iterate through A and B 1 step at a time
+change seen to True
+change seen to True after visiting
+if both reach end without seeing seen as True, return None
+if we do see a True, return that node
 '''
 
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, x):
-#         self.val = x
-#         self.next = None
+from typing import Optional, List
+
+
+class ListNode:
+    def __init__(self, x):
+        self.val = x
+        self.next = None
+        self.seen = False
 
 class Solution:
     def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> Optional[ListNode]:
         
+        while headA or headB:
+            if headA:
+                if headA.seen:
+                    return headA
+                headA.seen = True
+                headA = headA.next
+            if headB:
+                if headB.seen:
+                    return headB
+                headB.seen = True
+                headB = headB.next
+        
+        return None
+    
+    def createLinkedList(self, arr: List[int]) -> Optional[ListNode]:
+        if len(arr) == 0:
+            return None
+        head = ListNode(arr[0])
+        start = head
+        if len(arr) == 1:
+            return head
+        for i in range(1, len(arr)):
+            head.next = ListNode(arr[i])
+            head = head.next
+        return start
