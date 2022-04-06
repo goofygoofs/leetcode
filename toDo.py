@@ -7,4 +7,7 @@ intersection of two linked lists
 
 merge two sorted lists
     refactor for redundant code
+
+reorderList
+    used stack - review
 '''
