@@ -4,4 +4,7 @@ palindrome linked list
 
 intersection of two linked lists
     re-do
+
+merge two sorted lists
+    refactor for redundant code
 '''

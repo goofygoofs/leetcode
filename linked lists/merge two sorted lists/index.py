@@ -30,14 +30,51 @@ Both list1 and list2 are sorted in non-decreasing order.
 '''
 
 '''
+pointer on each list
 
+we gonna compare and create a new node of the lowest value, iterate one for the used value
+if one list is None go out of loop and add the rest of the other list
+
+time - O(n + m)
+space - O(n + m)
 '''
 
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
+from typing import Optional
+
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+        
 class Solution:
     def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        mergedList = ListNode(-1) 
+        curr = mergedList
+
+        while list1 and list2:
+            if list1.val <= list2.val:
+                node = ListNode(list1.val)
+                curr.next = node
+                curr = node
+                list1 = list1.next
+            else:
+                node = ListNode(list2.val)
+                curr.next = node
+                curr = node
+                list2 = list2.next
         
+        while list1:
+            node = ListNode(list1.val)
+            curr.next = node
+            curr = node
+            list1 = list1.next
+        
+        while list2:
+            node = ListNode(list2.val)
+            curr.next = node
+            curr = node
+            list2 = list2.next
+
+        return mergedList.next
