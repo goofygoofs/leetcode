@@ -28,17 +28,58 @@ The number of nodes in the list is in the range [1, 5 * 104].
 '''
 
 '''
+front and end pointers
+create a stack and count variable to keep count using while loop while moving end pointer to the back
+shift front pointer using next variable, and updating it's next to end
+pop off end until correct amount of count variable
+
+O(n) time
+O(n) space for stack
 
 '''
 
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
+from typing import Optional
+
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+        
 class Solution:
     def reorderList(self, head: Optional[ListNode]) -> None:
         """
         Do not return anything, modify head in-place instead.
         """
+        # create stack and count variable
+        # length of node CAN be 1... review
+        stack = []
+        count = 0
+        curr = head
+        end = None
+        while curr:
+            count += 1
+            stack.append(curr)
+            curr = curr.next
         
+        if count == 1:
+            return head
+
+        front = head
+        while count > 0:
+            next = front.next
+            end = stack.pop()
+            # print('end.val', end.val)
+            if count == 1: # odd length count
+                front.next = None
+                return head
+            front.next = end
+            if next == end: # even length count
+                end.next = None
+                return head
+            end.next = next
+            front = next
+            count -= 2
+        
+        return head
