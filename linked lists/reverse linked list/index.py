@@ -29,6 +29,16 @@ Follow up: A linked list can be reversed either iteratively or recursively. Coul
 '''
 
 '''
+    1   <-  2   <-  3   <-  4   <-  5
+                                prev
+                                    curr
+                                    next
+
+iterate through
+curr.next = prev
+prev = curr
+curr = next
+return prev at the end
 
 '''
 
@@ -43,4 +53,16 @@ class ListNode:
         
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None:
+            return None
         
+        prev = None
+        curr = head
+        
+        while curr:
+            next = curr.next
+            curr.next = prev
+            prev = curr
+            curr = next
+        
+        return prev
