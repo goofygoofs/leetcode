@@ -38,15 +38,32 @@ Follow up: Can you solve it using O(1) (i.e. constant) memory?
 '''
 
 '''
-
+fast and slow runner. 1 pointer moves 2 spaces, other moves 1. if next or next.next is None, return false
+O(n) time
+O(1) space
 '''
 
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, x):
-#         self.val = x
-#         self.next = None
+class ListNode:
+    def __init__(self, x):
+        self.val = x
+        self.next = None
+
+from typing import Optional
+
 
 class Solution:
     def hasCycle(self, head: Optional[ListNode]) -> bool:
-        
+        if head is None:
+            return False
+
+        fast = head
+        slow = head
+
+        while fast.next and fast.next.next:
+            fast = fast.next.next
+            slow = slow.next
+            if fast == slow:
+                return True
+
+        return False
