@@ -48,19 +48,24 @@ Follow-up: Can you implement the queue such that each operation is amortized O(1
 class MyQueue:
 
     def __init__(self):
+        self.s1 = []
+        self.s2 = []
         
 
     def push(self, x: int) -> None:
-        
+        self.s1.append(x)        
 
     def pop(self) -> int:
+        while len(self.s1) > 0:
+            self.s2.append(self.se)
+
         
 
     def peek(self) -> int:
-        
+        return self.s1[0]
 
     def empty(self) -> bool:
-        
+        return len(self.s1) == 0       
 
 
 # Your MyQueue object will be instantiated and called as such:
