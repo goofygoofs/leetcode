@@ -41,14 +41,45 @@ The number of nodes in the list is in the range [1, 105].
 '''
 
 '''
+iterate through and store length of list in variable index
+odd / even <- stop at x<= 1
+index = 1 => remove last index
+index = 0 => return empty
 
+O(n) time
+O(1) space
 '''
 
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
+from typing import Optional
+
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+        
 class Solution:
     def deleteMiddle(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        index = 0
+        end = head
         
+        while end.next:
+            end = end.next
+            index += 1
+        
+        if index == 0:
+            return None
+        
+        if index == 1:
+            head.next = None
+            return head
+        
+        curr = head
+        while index > 2:
+            curr = curr.next
+            index -= 2
+        
+        curr.next = curr.next.next
+
+        return head
