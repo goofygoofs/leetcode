@@ -41,18 +41,35 @@ If 99% of all integer numbers from the stream are in the range [0, 100], how wou
 '''
 
 '''
+have 2 queues
+when len of 1st queue larger, return the median (middle element). when it's even, popleft of the 2nd queue, add to first appendleft queue. also if even, return the median (q1[0] + q2[0])/2
 
+append():- This function is used to insert the value in its argument to the right end of the deque.
+appendleft():- This function is used to insert the value in its argument to the left end of the deque.
+pop():- This function is used to delete an argument from the right end of the deque.
+popleft():- This function is used to delete an argument from the left end of the deque.
 '''
+from collections import deque
 class MedianFinder:
 
     def __init__(self):
-        
+        self.q1 = deque()
+        self.q2 = deque()
 
     def addNum(self, num: int) -> None:
-        
+        if len(self.q1) != len(self.q2):
+            # moves so it's even length
+            self.move()
+        self.q2.append(num)
 
     def findMedian(self) -> float:
-        
+        if len(self.q1) != len(self.q2):
+            return self.q2[0]
+        return (self.q1[0] + self.q2[0]) / 2.0
+
+    def move(self) -> None:
+        self.q1.appendleft(self.q2.popleft())
+
 
 
 # Your MedianFinder object will be instantiated and called as such:
