@@ -29,14 +29,77 @@ It is guaranteed that the list represents a number that does not have leading ze
 '''
 
 '''
+go to the end of both list
+create a new list adding
+carry over if >= 10
+also if remainder without carry over, then add the extra digit
+keep count variables for both for leading zero and add leading zero when adding
+can do in 1 loop  with or statement and if reach end of prevl1 or prevl2, keep adding zeros
+
+time - O(max(n, m))
+space - O(max(n, m)) to create summed list
 
 '''
 
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
+from typing import Optional
+
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+        
 class Solution:
     def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        currl1 = l1
+        prevl1 = None
+        currl2 = l2
+        prevl2 = None
         
+        remainder = 0
+        dummy = ListNode(-1)
+        curr = dummy
+
+        while currl1 or currl2:
+            if currl1:
+                next = currl1.next
+                currl1.next = prevl1
+                prevl1 = currl1
+                currl1 = next
+            else:
+                next = ListNode(0)
+                prev = prevl1
+                prevl1 = next
+                prevl1.next = prev
+            if currl2:
+                next = currl2.next
+                currl2.next = prevl2
+                prevl2 = currl2
+                currl2 = next
+            else:
+                next = ListNode(0)
+                prev = prevl2
+                prevl2 = next
+                prevl2.next = prev
+        
+            val = prevl1.val + prevl2.val + remainder
+
+            if val >= 10:
+                remainder = 1
+                val = val % 10
+            else:
+                remainder = 0
+
+            node = ListNode(val)
+            curr.next = node
+            curr = curr.next            
+        
+        if remainder > 0:
+            node = ListNode(remainder)
+            curr.next = node
+            curr = node
+
+
+        return dummy.next
+
