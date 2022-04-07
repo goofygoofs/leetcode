@@ -48,27 +48,114 @@ append():- This function is used to insert the value in its argument to the righ
 appendleft():- This function is used to insert the value in its argument to the left end of the deque.
 pop():- This function is used to delete an argument from the right end of the deque.
 popleft():- This function is used to delete an argument from the left end of the deque.
+
+gotta use a minQueue and maxQueue to find median.
+
+#  two heaps, large, small, minheap, maxheap
+# heap should be equal size
+
+for maxHeap (small), multiply the number by -1 before adding in
 '''
-from collections import deque
+
+'''
+median is the middle value, if list is even there is no middle value, so we take the sum and divide by 2 (if odd)
+we are going to have 2 subsets and all all elements on the left is goingg to be length less than or equal all elements in the right 
+
+[small heap] = [large heap]
+[3 elements] = [2 elements] ok
+if more than 1 element, we have to balance it so it's even or off by 1
+
+add/remove is log(n)
+
+maxHeap - find max is O(1). implemented as a maxHeap
+
+minHeap - find min is O(1). implemented as a minHeap
+
+small heap (max heap) [1,2] -> need 2
+
+large heap (min heap) [3, 4] -> need 3
+
+will only work if length is the same or off by 1
+
+if odd number of elements, we want to get the max value from the maxHeap
+
+maxHeap - [1,2,3]
+minHeap - [4,5]
+
+add/remove from heap is O(log(n)) operation
+
+finding max/min from max/min heap is O(1) operation
+
+last condition is is all elements in maxHeap(small) less than in minHeap(large)?
+small heap [maxHeap] [2, 7]
+large heap [minHeap] [3]
+
+the answer is no. remove the 7 and add it to min heap
+
+so it is [maxHeap] [2]
+[minHeap] [7, 3]
+
+how about if we add 4?
+
+[2, 4]
+
+[7, 3]
+
+=>
+
+[2]
+
+[7, 4, 3]
+
+pop 4 and add to minHeap but no the length aren't equal or off by 1
+what do we do?
+
+find min from minHeap, popoff and add to maxHeap
+
+[2, 3]
+
+[7, 4]
+
+time complexity of .getMedian is O(1)
+
+time complexity of .addNum is O(log(n))
+
+'''
+import heapq
 class MedianFinder:
 
     def __init__(self):
-        self.q1 = deque()
-        self.q2 = deque()
+        #  two heaps, large, small, minheap, maxheap
+        # heap should be equal size
+        self.small, self.large = [], [] # maxHeap, minHeap (python default)
 
     def addNum(self, num: int) -> None:
-        if len(self.q1) != len(self.q2):
-            # moves so it's even length
-            self.move()
-        self.q2.append(num)
+        # always add to small
+        # in python only implements min heaps, we know small is actually a maxHeap
+        # so to get around that we are going to multiply by -1
+        heapq.heappush(self.small, -1 * num)
+
+        # make sure every num small is <= every num in large
+        # also balance length - difference greater than 1?
+        if (self.small and self.large and (-1 * self.small[0]) > self.large[0]) \
+        or len(self.small) > len(self.large) + 1:
+            val = -1 * heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        
+        # also balance length from vice/versa 
+        if len(self.large) > len(self.small) + 1:
+            val = heapq.heappop(self.large)
+            heapq.heappush(self.small, -1 * val)
 
     def findMedian(self) -> float:
-        if len(self.q1) != len(self.q2):
-            return self.q2[0]
-        return (self.q1[0] + self.q2[0]) / 2.0
-
-    def move(self) -> None:
-        self.q1.appendleft(self.q2.popleft())
+        # odd length and more small than large
+        if len(self.small) > len(self.large):
+            return -1 * self.small[0]
+        # odd length and more large than small
+        elif len(self.large) > len(self.small):
+            return self.large[0]
+        #  even length
+        return (-1 * self.small[0] + self.large[0]) / 2
 
 
 
