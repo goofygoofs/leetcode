@@ -38,24 +38,31 @@ At most 3 * 104 calls will be made to push, pop, top, and getMin.
 '''
 
 '''
-
+to keep track of min, gotta store as a tuple of the min
+top of stack - last element or first to come out
 '''
 
 class MinStack:
 
     def __init__(self):
-        
+        self.stack = []
 
     def push(self, val: int) -> None:
-        
+        if len(self.stack) == 0:
+            self.stack.append((val, val))
+        else:
+            minVal = min(self.stack[-1][1], val)
+            self.stack.append((val, minVal))
 
     def pop(self) -> None:
-        
+        self.stack.pop()
 
     def top(self) -> int:
+        return self.stack[-1][0]
         
 
     def getMin(self) -> int:
+        return self.stack[-1][1]
         
 
 
