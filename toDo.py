@@ -1,7 +1,4 @@
 '''
-merge two sorted lists
-    refactor for redundant code
-
 reorderList
     used stack - review
 
