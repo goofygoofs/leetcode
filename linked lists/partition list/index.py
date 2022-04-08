@@ -39,6 +39,29 @@ what if all elements < x?
 update right to be at least furthest element < x
 '''
 
+'''
+partition list that every value less than x is on the left side, and greater or equal on the right side
+preserve the original order 
+
+O(n) time
+O(1) space
+
+make 2 different sublist
+all less than values in the left list
+all greater than or equal in the requal
+take the left list and connect it to the beginning of the right list
+x=3
+1->4->3->2->5->2
+left->1->2->2->None
+right->4->3->5->(connected to the 2)
+
+take 2 at end of left connect it to beginning of right 4
+take the 5 and change it's next to None
+
+it's O(1) space because we are just using head and storing that to a variable?
+
+'''
+
 # Definition for singly-linked list.
 from typing import Optional
 
@@ -50,49 +73,23 @@ class ListNode:
         
 class Solution:
     def partition(self, head: Optional[ListNode], x: int) -> Optional[ListNode]:
-        if head is None:
-            return None
-        
-        if head.next is None:
-            return head
-        
-        left = head
-        right = head
+        # dummy nodes
+        left, right = ListNode(), ListNode()
+        # will always point at the last node in our left and right list
+        # so we can easily add an element to the end of these lists
+        ltail, rtail = left, right
 
-        leftMostGreaterThanX = False
-
-        # starting left
-        while left:
-            if left.val < x:
-                break
-            leftMostGreaterThanX = True
-            left = left.next
+        while head:
+            if head.val < x:
+                ltail.next = head
+                ltail = ltail.next
+            else:
+                rtail.next = head
+                rtail = rtail.next
+            head = head.next
         
-        # update pointers 
-        if leftMostGreaterThanX:
-            leftNext = left.next
-            left.next = right
-            # move right to right most:
-            while right.next.val >= x:
-                right = right.next
-            right.next = leftNext
-            right = right.next
-            head = left
-
-        while right:
-            if right.next:
-                if right.next.val < x:
-                    next = left.next
-                    left.next = right.next
-                    left = left.next
-                    if right.next.next:
-                        right.next = right.next.next
-                    else:
-                        right.next = None
-                        right = None
-                    left.next = next
-                else:
-                    right = right.next
-        
-        return head
-            
+        # we do right.next because right itself is a dummy node
+        ltail.next = right.next
+        # need to terminate list and have it point at None
+        rtail.next = None
+        return left.next
