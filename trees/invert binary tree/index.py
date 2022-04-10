@@ -26,15 +26,34 @@ The number of nodes in the tree is in the range [0, 100].
 '''
 
 '''
-
+what is invert?,
+swap the left with the right subtree
+case where there is a left node but no right?
+set root.left = right
+vice versa
+time: O(n) where n is # of nodes
+space: O(n) for number for stacks for recursion 
 '''
 
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
+from typing import Optional
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 class Solution:
     def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
-        
+        if root is None:
+            return None
+        def helper(root: Optional[TreeNode]) -> Optional[TreeNode]:
+            if root is None:
+                return None
+            left = root.left
+            right = root.right
+            root.left = helper(right)
+            root.right = helper(left)
+            return root
+        return helper(root)
