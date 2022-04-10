@@ -33,6 +33,23 @@ if bool if any False, return False. check value if checks out. if False, return 
 use AND to compare
 '''
 
+'''
+valid BST 
+every node in left subtree is less than node.val
+every node in right subtree is greater than node.val
+left boundary (-inf < 3 < 5)
+right boudnary (5 < 7 < inf)
+right boundary (7 < 8 < inf)
+left boundary (5 < 4 < 7) No, this breaks our boundary
+
+gotta use OR instead of left <= node.val <= right
+so it will be
+left<= node.val or node.val <= right
+
+time - O(n)
+space - O(h) height of tree because of recursion
+'''
+
 # Definition for a binary tree node.
 from typing import Optional, Tuple
 
@@ -45,31 +62,14 @@ class TreeNode:
 class Solution:
     def isValidBST(self, root: Optional[TreeNode]) -> bool:
 
-        # returns (bool, TreeNode, min: int, max: int)
-        def helper(node: Optional[TreeNode]) -> Tuple[bool, TreeNode, int, int]:
-            if node is None:
-                return (True, None, float('inf'), float('-inf'))
-            left = helper(node.left)
-            right = helper(node.right)
-            # stop early if any False
-            if left[0] is False or right[0] is False:
-                return (False, None, float('inf'), float('-inf'))
+        def helper(node: Optional[TreeNode], left: int, right: int) -> bool:
+            if not node:
+                return True
 
-            # check min and max of entire tree
-            # also check left vs right subtree min and maxes
-            if left[2] >= node.val >= right[2] or left[3] >= node.val >= right[3] \
-                or left[2] >= right[2] or left[3] >= right[3]:
-                return (False, None, float('inf'), float('-inf'))
-            # check local validity
-            if left[1] and right[1]:
-                if left[1].val >= node.val >= right[1].val:
-                    return (False, None, float('inf'), float('-inf'))
-            if left[1]:
-                if left[1].val >= node.val:
-                    return (False, None, float('inf'), float('-inf'))
-            if right[1]:
-                if node.val >= right[1].val:
-                    return (False, None, float('inf'), float('-inf'))
-            return (left[0] and right[0], node, min(node.val, left[2], right[2]), max(node.val, left[3], right[3]))
+            if left >= node.val or node.val >= right:
+                return False
+            
+            return helper(node.left, left, node.val) and helper(node.right, node.val, right)
 
-        return helper(root)[0]
+        return helper(root, float("-inf"), float("inf"))
+
