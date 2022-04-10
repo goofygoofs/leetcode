@@ -29,15 +29,28 @@ The number of nodes in both trees is in the range [0, 100].
 '''
 
 '''
-
+check if both are none, check either is none = return False. check val different, return false, return recursion on the left AND right
+time - O(max(p, q))
+stack - O(max(p, q))
 '''
 
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
+from typing import Optional
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 class Solution:
     def isSameTree(self, p: Optional[TreeNode], q: Optional[TreeNode]) -> bool:
-        
+        if p is None and q is None:
+            return True
+        if p is None:
+            return False
+        if q is None:
+            return False
+        if p.val != q.val:
+            return False
+        return self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
