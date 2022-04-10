@@ -33,15 +33,53 @@ p and q will exist in the tree.
 '''
 
 '''
+recursion
+we need to somehow pass level, lowest level and the node
+return the lowest node on the lowest level that contains both p and q
+LCA is determined by check if p and q exist in => left subtree, node, and right subtree.
+only 1 each
+all unique values
 
+O(n) time
+O(h) space
 '''
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, x):
-#         self.val = x
-#         self.left = None
-#         self.right = None
+from typing import Optional, Tuple
+
+
+class TreeNode:
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
 
 class Solution:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestor(self, root: Optional[TreeNode], p: Optional[TreeNode], q: Optional[TreeNode]) -> Optional[TreeNode]:
         
+        def helper(node: Optional[TreeNode], p: int, q: int) -> Tuple[bool, TreeNode]:
+            if not node:
+                return (False, None)
+            containLeft = helper(node.left, p, q)
+            containNode = node.val == p or node.val == q
+            containRight = helper(node.right, p, q)
+
+            isLCA = 0 
+            if containLeft and containLeft[0]:
+                if containLeft[1]:
+                    return containLeft
+                isLCA += 1
+            if containNode:
+                isLCA += 1
+            if containRight and containRight[0]:
+                if containRight[1]:
+                    return containRight
+                isLCA += 1
+
+            if isLCA == 2:
+                return (True, node)
+            if isLCA == 1:
+                return (True, None)
+
+            return (False, None)
+
+        return helper(root, p.val, q.val)[1]
