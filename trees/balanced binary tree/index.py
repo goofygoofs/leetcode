@@ -35,8 +35,31 @@ each time go down left and rigth, add 1 for each layer
 can't be more difference by 1
 '''
 
+'''
+what is defined as height balanced?
+height of left subtree is 1
+height of right subtree is 2
+difference is 1
+that also means each left and right subtree has to be balanced too so one that goes down just left.left.left with no rights is not balanced
+if we go through each node, we have to do an O(n) operation where n is number of nodes
+and we do this operation n times, we're going to get a time complexity of O(N^2)
+can we do better than that, is there any repeated work?
+yes there is repeated work and it can be eliminated by 
+asking the question in a different order. instead of first asking if the entire tree is balanced 
+from the root node, we ask is it balanced starting from here instead of asking that we do this bottom up
+we ask is this entire subtree balanced, until we keep going lower and lower until
+we get to the base case once we get to the base case
+we going to go back up and show how that's actually going to eliminate the repeated work
+if we do it in this order. we'll only have to visit each node at most one time to ensure
+overall time complexity is O(n) instead of n^2
+we return the height of each subtree on the left and right
+and take the difference between those
+going to return a boolean as the first value and the height as the 2nd value
+if we ever find False, we gotta return False at the root
+'''
+
 # Definition for a binary tree node.
-from typing import Optional
+from typing import Optional, Tuple
 
 
 class TreeNode:
@@ -50,17 +73,16 @@ class Solution:
             return True
         
 
-        def helper(root: Optional[TreeNode]) -> int:
+        def helper(root: Optional[TreeNode]) -> Tuple[bool, int]:
             if root is None:
-                return 0
-            left = helper(root.left)
-            right = helper(root.right)
-            return max(1 + left, 1 + right)
-        
-        left = helper(root.left)
-        right = helper(root.right)
+                return (True, 0)
+            left, right = helper(root.left), helper(root.right)
+            leftBalanced, rightBalanced = left[0], right[0]
+            difference = abs(left[1] - right[1])
+            balanced = (leftBalanced and rightBalanced and difference <= 1)
+            return (balanced, 1 + max(left[1], right[1]))
 
-        return left == right or left + 1 == right or left == right + 1
+        return helper(root)[0]
 
 
 tree = TreeNode(1)
@@ -68,12 +90,8 @@ tree.left = TreeNode(2)
 tree.right = TreeNode(2)
 left = tree.left
 left.left = TreeNode(3)
-right = tree.right
-right.right = TreeNode(3)
 left = tree.left
 left.left = TreeNode(4)
-right = tree.right
-right.right = TreeNode(4)
 
 sol = Solution()
 output = sol.isBalanced(tree)
