@@ -50,6 +50,17 @@ O(n) time where n is number of nodes
 O(n) space to store right subtree in stack
 '''
 
+'''
+when they say they want it to be flatten to pre-order traversal, that means the
+root node goes first, then next is process the left subtree, then the right subtree
+once we have flattened the entire left subtree, we have to return a pointer to the last node
+or rather the tail of the linked list. if we have the tail of the linked list, then we can
+connect that pointer over to the right child of the root node. so we have to return the tail of
+the linked list
+since we are traversing the tree the space will be O(h) height of tree
+to get the last pointer, return rightTail or leftTail or node
+'''
+
 # Definition for a binary tree node.
 from typing import List, Optional
 
@@ -64,23 +75,20 @@ class Solution:
         """
         Do not return anything, modify root in-place instead.
         """ 
-        # helper will take in the next node and return the stored 
-        # right node in a stack
-        # O(m) space where m is number of nodes on right side 
-        def helper(node: Optional[TreeNode], stack: List[TreeNode]) -> None:
+        # flatten the root tree and return the list tail
+        def helper(node: Optional[TreeNode]) -> Optional[TreeNode]:
             if node is None:
-                return
-            left = node.left
-            right = node.right
-            node.right = left
-            node.left = None
-            if right:
-                stack.append(right)
-            helper(node.right, stack)
-            if len(stack) > 0:
-                node.right = stack.pop()
-                helper(node.right, stack)
-            
-            return
-        helper(root, [])
+                return None
+            leftTail = helper(node.left)
+            rightTail = helper(node.right)
+
+            # only do insert operation if leftTail has a node
+            if leftTail:
+                leftTail.right = node.right
+                node.right = node.left
+                node.left = None
+            last = rightTail or leftTail or node
+            return last
+
+        helper(root)
         
