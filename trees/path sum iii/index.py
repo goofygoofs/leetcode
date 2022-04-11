@@ -25,15 +25,50 @@ The number of nodes in the tree is in the range [0, 1000].
 '''
 
 '''
+we are going all the way to the bottom
+we are going to return left value, node val, and right val
+add the current node val to all 3 then return it to it's parents
+
+time - O(n)
+space - O(3n)?
+what ;if we get a 0 answer? 1 -> -1 -> 8 if target is 8?
 
 '''
 
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
+from typing import List, Optional, Tuple
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 class Solution:
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
         
+        output = 0
+
+        if root is None:
+            return output
+        
+        def helper(node: Optional[TreeNode]) -> List[int]:
+            if node is None:
+                return []
+            left = helper(node.left) # [3]
+            right = helper(node.right) # [-2]
+            
+            for num in left:
+
+
+            # we are not at a leaf node
+            if len(left) > 0:
+                leftValue = left.val + node.val
+            # we are not at a leaf node
+            if len(right) > 0:
+                rightValue = right.val + node.val
+            return (leftValue, node.val, rightValue)
+            
+        
+        helper(root)
+        return output
