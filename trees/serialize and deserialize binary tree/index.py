@@ -33,6 +33,22 @@ convert this entire tree into a string
 and we want to take a string like this and turn it into a tree
 can use BFS taking it level by level serializing the tree
 check for 'None' string in deserializing
+
+can do it by DFS using pre-order traversal - this uses less code
+root node is 1., then do left subtree. then right subtree. use comma as a delimiter
+"1,2,N,N,3,4,N,N,5,5,N,N"
+is this string ambiguous? do we know which goes to left or right subtree?
+we are going to have a string and split it to an array
+how do we know when the left subtree stops and when the right subtree starts?
+if it's a Null we can't continue anymore
+we reach our base case if both children is Null
+next value (3) is the right child of 1. for 4, both children is Null so the right of 3 is 5
+then both children of 5 is Null
+for every single leaf node we specific all the Nulls
+that's why it's not ambigious
+O(n) for serializing and deserializing
+O(n) for the string and array
+for serializing, use an array, then join by "," at the end to avoid extra commas
 '''
 
 # Definition for a binary tree node.
@@ -50,30 +66,17 @@ class Codec:
         :type root: TreeNode
         :rtype: str
         """
-        if not root:
-            return ""
-        queue = deque([root])
-        output = ""
+        output = []
 
-        while len(queue) > 0:
-            nextLevel = deque()
-            while len(queue) > 0:
-                node = queue.popleft()
-                if not node:
-                    output += "None,"
-                else:
-                    output += str(node.val) + ","
-                    if node.left:
-                        nextLevel.append(node.left)
-                    else:
-                        nextLevel.append(None)
-                    if node.right:
-                        nextLevel.append(node.right)
-                    else:
-                        nextLevel.append(None)
-            if len(nextLevel) > 0:
-                queue = nextLevel
-        return output[:-1]
+        def helper(node):
+            if not node:
+                output.append("N")
+                return
+            output.append(str(node.val))
+            helper(node.left)
+            helper(node.right)
+        helper(root)
+        return ",".join(output)
 
     def deserialize(self, data):
         """Decodes your encoded data to tree.
@@ -81,42 +84,21 @@ class Codec:
         :type data: str
         :rtype: TreeNode
         """
-        if not data:
-            return None
-        # [1,2,3,null,null,4,5]
-        # [2,3,null,null,4,5]
-        # [null,null,4,5]
-        queue = deque(data.split(','))
-        root = TreeNode(queue.popleft())
-        # []
-        treeQueue = deque([root])
-        
-        # left 2
-        # right 3
+        vals = data.split(",")
+        # because we want it to be global pointer
+        self.i = 0
 
-        while len(queue) > 0:
-            nextLevel = deque()
-            while len(treeQueue) > 0:
-                node = treeQueue.popleft()
-                left, right = queue.popleft(), queue.popleft()
-                if left != 'None':
-                    left = TreeNode(left)
-                else:
-                    left = None
-                node.left = left
-                if right != 'None':
-                    right = TreeNode(right)
-                else:
-                    right = None
-                node.right = right
-                # check if add to next level
-                if left != None:
-                    nextLevel.append(left)
-                if right != None:
-                    nextLevel.append(right)
-            if len(nextLevel) > 0:
-                treeQueue = nextLevel
-        return root
+        def helper():
+            if vals[self.i] == "N":
+                self.i += 1
+                return None
+            node = TreeNode(int(vals[self.i]))
+            self.i += 1
+            node.left = helper()
+            node.right = helper()
+            return node
+        return helper()
+
             
 
 
