@@ -28,15 +28,40 @@ The number of nodes in the tree is in the range [1, 3 * 104].
 '''
 
 '''
+pre-order
+L, node, Right
+find out if it's better to use L, N, or R or a combination of those
+by seeing if values of each greater than 0
 
+gotta make another function and a maxSum variable in init because
+if we return max of every position up, say if it's only right that's biggest,
+we can't have it add that with the parent's node, skipping the node.
+O(n) time complexity
+O(1) space
 '''
 
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
+from typing import Optional
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 class Solution:
+    def __init__(self):
+        self.maxSum = float('-inf')
     def maxPathSum(self, root: Optional[TreeNode]) -> int:
-        
+        def helper(root: Optional[TreeNode]) -> int:
+            left, node, right = float('-inf'), root.val, float('-inf')
+            if root.left:
+                left = helper(root.left)
+            if root.right:
+                right = helper(root.right)
+            print('node', node)
+            print(left, right)
+            self.maxSum = max(self.maxSum, left, left+node, left+node+right, node, node+right, right)
+            return max(left + node, node, node + right)
+        helper(root)
+        return self.maxSum
