@@ -27,15 +27,39 @@ Follow up: If the BST is modified often (i.e., we can do insert and delete opera
 '''
 
 '''
-
+go to smallest one => keep going left
+then go pre-order
+left, node, right
+go up until it's k smallest
+since we know order because it's binary tree
+O(k + lgn) time
+O(1) space 
 '''
 
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
+from typing import Optional, Tuple
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 class Solution:
     def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
-        
+        # use array to modify by reference
+        output = [k, 0]
+        def helper(node: Optional[TreeNode]) -> None:
+            # return early if 0
+            if output[0] == 0:
+                return
+            if node.left:
+                helper(node.left)
+            output[0] -= 1
+            if output[0] == 0:
+                output[1] = node.val
+            if node.right:
+                helper(node.right)
+
+        helper(root)
+        return output[1]
