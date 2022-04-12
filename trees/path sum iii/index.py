@@ -35,9 +35,17 @@ what ;if we get a 0 answer? 1 -> -1 -> 8 if target is 8?
 
 '''
 
+'''
+get current sum as going down, not from bottom up
+if current sum (node.val + whatever preivous from parent) - targetSum = 0 (we have a match)
+then subtract the target from the currSum to see if any previous nodes adds up to the targetNum
+we use a dict that increments currSum and adds if that currSum - targetSum becuase there can be targetSum on both sides
+so it will go up by a certain amount if another target num comes in on the other side
+we then remove mapping[currSum] -= 1 as we backtrack
+'''
 # Definition for a binary tree node.
 from typing import List, Optional, Tuple
-
+from collections import defaultdict
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -46,29 +54,38 @@ class TreeNode:
         self.right = right
 class Solution:
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
-        
-        output = 0
+        # arrays works better with python's namespace and updating the first value
+        # using a variable will have scope issues in this way
+        output = [0]
+        def helper(node: Optional[TreeNode], currSum: int) -> None:
+            if not node:
+                return
+            currSum += node.val
+            if currSum - targetSum in mapping:
+                output[0] += mapping[currSum - targetSum]
+            mapping[currSum] += 1
+            # print('node.val', node.val)
+            # print('mapping', mapping)
+            # print('output', output)
+            helper(node.left, currSum)
+            helper(node.right, currSum)
+            mapping[currSum] -= 1
+        mapping = defaultdict(int)
+        mapping[0] = 1
+        helper(root, 0)
+        return output[0]
 
-        if root is None:
-            return output
-        
-        def helper(node: Optional[TreeNode]) -> List[int]:
-            if node is None:
-                return []
-            left = helper(node.left) # [3]
-            right = helper(node.right) # [-2]
-            
-            for num in left:
+tree = TreeNode(5)
+left = TreeNode(3)
+tree.left = left
+left = tree.left
+left.left = TreeNode(-1)
+left = left.left
+left.left = TreeNode(1)
+left = left.left
+left.left = TreeNode(8)
 
+sol = Solution()
 
-            # we are not at a leaf node
-            if len(left) > 0:
-                leftValue = left.val + node.val
-            # we are not at a leaf node
-            if len(right) > 0:
-                rightValue = right.val + node.val
-            return (leftValue, node.val, rightValue)
-            
-        
-        helper(root)
-        return output
+output = sol.pathSum(tree, 8)
+print(output)
