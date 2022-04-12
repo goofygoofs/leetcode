@@ -25,15 +25,42 @@ The number of nodes in the tree is in the range [0, 2000].
 '''
 
 '''
+while loop if queue is not length 0,
+actually have to add an array that appends into the loop
+we loop through that and get all it's non -none left and rights, add to array, 
+go from left to right so we need to use queue
 
+O(n) for time 
+O(level) for space
 '''
 
 # Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
+from typing import List, Optional
+from collections import deque
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
 class Solution:
     def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
-        
+        # queue is a list of TreeNodes
+        if root is None:
+            return []
+        queue = deque([root])
+        output = []
+        while len(queue) > 0:
+            values = []
+            treeNodes = []
+            while len(queue) > 0:
+                node = queue.popleft()
+                values.append(node.val)
+                if node.left:
+                    treeNodes.append(node.left)
+                if node.right:
+                    treeNodes.append(node.right)
+            output.append(values)
+            if len(treeNodes) > 0:
+                queue = deque(treeNodes)
+        return output
