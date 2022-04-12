@@ -33,7 +33,13 @@ left, node, right
 go up until it's k smallest
 since we know order because it's binary tree
 O(k + lgn) time
-O(1) space 
+O(lgn) space for stack 
+'''
+
+'''
+binary search tree means everything in left subtree is less < node.val < right.val
+any way we can put it in a sorted array?
+
 '''
 
 # Definition for a binary tree node.
