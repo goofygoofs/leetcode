@@ -34,6 +34,31 @@ then get the right from in-order
 use queue on both
 '''
 
+'''
+given 2 integer arrays representing preorder and inorder traversals of a binary tree. it has all
+the info we need. we just need to take info and deconstruct it and construct the original binary tree
+preorder - process at root (node) and then left subtree. then right subtree
+    first value always the root(node)
+inorder - starts at the leftmost subtree processing left first, then process node, then right subtree
+    first value always the left node
+every value in the traversal is unique because it is binary tree
+every value to the left of the first value of pre-order in inorder is going in the left subtree of the root
+and every value to the right of the first value of pre-order in inorder is going in the right subtree
+what we can do is take the remainder of what's in the pre-order array and partition it
+we know 1 value is going in the left subtree and 3 values are going in the right subtree
+we're going to do this recursively
+the first value to the right of the root is the node in preorder
+find 20 (mid) we don't need 20 anymore. there's 1 value on the left of 20 and 1 value on the right of 20
+contstruct that left subtree with the 1 value and the right subtree with the 1 value
+once we find mid (which is first value in pre-order) we can find the lenght of the left subtree (left subarray) and right subtree(right subarray)
+these counts tell us how to partition the pre-order traversel
+from that partition it tells us how many nodes go in the left subtree (run recursively), and for right subtree (run recursively)
+always start with base case. no nodes
+
+time - O(n + 1/2n?)
+space - O(n) for splicing + O(h) for stack
+'''
+
 # Definition for a binary tree node.
 from typing import List, Optional
 from collections import deque
@@ -45,30 +70,15 @@ class TreeNode:
         self.right = right
 class Solution:
     def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
-        preorder = deque(preorder)
-        inorder = deque(inorder)
-        root = TreeNode(preorder.popleft())
-        curr = root
-
-        # remove first inorder if equal to preorder root
-        if root.val == inorder[0]:
-            inorder.popleft()
+        if not preorder or not inorder:
+            # don't need to create a tree
+            return None
         
-        def helper(node: Optional[TreeNode]) -> None:
-            if len(preorder) > 0 and len(inorder) > 0:
-                left = TreeNode(preorder.popleft())
-                node.left = left
-                # can still keep going left until leftmost leaf
-                if left.val != inorder[0]:
-                    helper(node.left)
-                else:
-                    while inorder[0] != node.val:
-                        inorder.popleft()
-                    inorder.popleft()
-                    preorder.popleft()
-                right = TreeNode(inorder.popleft())
-                node.right = right
-
-        if len(preorder) > 0:
-            helper(curr)
+        # root always going to be the first value
+        root = TreeNode(preorder[0])
+        # tells us the length of how many nodes in the left subtree
+        mid = inorder.index(preorder[0])
+        # left subtree will be built with up to the mid length
+        root.left = self.buildTree(preorder[1:mid+1], inorder[:mid])
+        root.right = self.buildTree(preorder[mid+1:], inorder[mid+1:])
         return root
