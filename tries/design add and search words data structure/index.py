@@ -37,19 +37,44 @@ At most 104 calls will be made to addWord and search.
 '''
 
 '''
+the issue here is the period dot. that means we have to iterate through every char for every period which is (26 * # of periods)
+otherwise it's the same as the Trie
+at most 3 dots so it's not so bad it's only 26*3 so it's constant
+actually not constant because 1,000,000 chars * 26 * 26 * 26 will be 17.5 billion operations
 
 '''
+class Trie:
+    def __init__(self):
+        self.trie = {}
+        self.isWord = False
 
 class WordDictionary:
 
     def __init__(self):
-        
+        self.root = Trie()
 
     def addWord(self, word: str) -> None:
-        
+        root = self.root.trie
+        for i, char in enumerate(word):
+            if char not in root:
+                root[char] = Trie()
+            if i == len(word) - 1:
+                root[char].isWord = True
+            root = root[char].trie
 
     def search(self, word: str) -> bool:
-        
+        root = self.root.trie
+        for i, char in enumerate(word):
+            trieKeys = root.keys()
+            if char == '*':
+
+            else:
+                if char not in root:
+                    return False
+                if i == len(word) - 1:
+                    return root[char].isWord
+                root = root[char].trie
+        return False
 
 
 # Your WordDictionary object will be instantiated and called as such:
