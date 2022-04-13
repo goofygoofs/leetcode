@@ -42,10 +42,16 @@ otherwise it's the same as the Trie
 at most 3 dots so it's not so bad it's only 26*3 so it's constant
 actually not constant because 1,000,000 chars * 26 * 26 * 26 will be 17.5 billion operations
 
+so we need dfs and if it's "." character, we dfs through the children.values() # which are Tries
+pass in index and current Trie as parameters to dfs
+also dfs (i + 1, child)
+we are passing i, not index
 '''
+
+
 class Trie:
     def __init__(self):
-        self.trie = {}
+        self.children = {}
         self.isWord = False
 
 class WordDictionary:
@@ -54,27 +60,33 @@ class WordDictionary:
         self.root = Trie()
 
     def addWord(self, word: str) -> None:
-        root = self.root.trie
-        for i, char in enumerate(word):
-            if char not in root:
-                root[char] = Trie()
-            if i == len(word) - 1:
-                root[char].isWord = True
-            root = root[char].trie
+        cur = self.root
+        for char in word:
+            if char not in cur.children:
+                cur.children[char] = Trie()
+            cur = cur.children[char]
+        cur.isWord = True
 
     def search(self, word: str) -> bool:
-        root = self.root.trie
-        for i, char in enumerate(word):
-            trieKeys = root.keys()
-            if char == '*':
-
-            else:
-                if char not in root:
+        def helper(index: int, root: Trie):
+            cur = root
+            for i in range(index, len(word)):
+                char = word[i]
+                if char == ".":
+                    for child in cur.children.values(): # child is a Trie
+                        if helper(i + 1, child):
+                            return True
                     return False
-                if i == len(word) - 1:
-                    return root[char].isWord
-                root = root[char].trie
-        return False
+                else:
+                    if char not in cur.children:
+                        return False
+                    cur = cur.children[char]
+            return cur.isWord
+        
+        return helper(0, self.root)
+
+
+
 
 
 # Your WordDictionary object will be instantiated and called as such:
