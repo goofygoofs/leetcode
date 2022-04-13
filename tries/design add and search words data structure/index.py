@@ -46,6 +46,9 @@ so we need dfs and if it's "." character, we dfs through the children.values() #
 pass in index and current Trie as parameters to dfs
 also dfs (i + 1, child)
 we are passing i, not index
+
+O(n * 26^3) time
+O(n) space for dictionary
 '''
 
 
