@@ -54,17 +54,57 @@ The Graph is connected and all nodes can be visited starting from the given node
 '''
 
 '''
+base case
 
+class Node {
+    public int val;
+    public List<Node> neighbors; -> List of nodes
+                                ie. [<__main__.Node object at 0x7f17c4c96530>, <__main__.Node object at 0x7f17c4c96aa0>]
+}
+
+no self loops, no reppeated edges and each value is unique
+
+get node's val and add to visited set
+dfs and for loop into each neighbor
+if not visited keep going? and set neighbor and value
+visited will be a dictionary of value(int) to new Node created
+or Node: Node
+
+O(n) time - n is number of nodes
+O(n) space - for dictionary
 '''
 
-"""
+
 # Definition for a Node.
+from typing import Dict, List, Set
+
+
 class Node:
     def __init__(self, val = 0, neighbors = None):
         self.val = val
         self.neighbors = neighbors if neighbors is not None else []
-"""
+
 
 class Solution:
     def cloneGraph(self, node: 'Node') -> 'Node':
+        # base case:
+        if node is None:
+            return None
         
+        
+        def helper(new: Node, old: Node, visited: Dict[Node, Node]) -> None:
+            
+            for neighbor in old.neighbors:
+                if neighbor not in visited:
+                    # create new neighbor
+                    visited[neighbor] = Node(neighbor.val)
+                    # visited[neighbor] = newNeighbor
+                    helper(visited[neighbor], neighbor, visited)
+                # add new neighbor
+                new.neighbors.append(visited[neighbor])
+
+
+        new = Node(node.val)
+        visited = {node: new}
+        helper(new, node, visited)
+        return new
