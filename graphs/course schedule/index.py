@@ -30,9 +30,62 @@ All the pairs prerequisites[i] are unique.
 '''
 
 '''
+need a course_to_prereq
+course: pre-requisite course
+{
+    0: 1
+}
+go from 0->n-1 and check what courses don't have pre-req and subtract that from numCourses
+return numCourses == 0
 
+{
+    1: 0,
+    0: 1
+}
+visited so we don't go in loops
+Set[int]
 '''
+
+from typing import Dict, List, Set
+from xmlrpc.client import Boolean
+
 
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        # create course: pre-requisite course course_to_prereqionary
+        self.coursesLeft = numCourses
+        course_to_prereq = {}
+        prereq_to_course = {}
+        for courseRequirement in prerequisites:
+            course_to_prereq[courseRequirement[0]] = courseRequirement[1]
+            prereq_to_course[courseRequirement[1]] = courseRequirement[0]
+        startingCourses = []
+        visited = set()
+        for i in range(numCourses):
+            if i not in course_to_prereq:
+                # no pre-requisite
+                self.coursesLeft -= 1
+                startingCourses.append(i)
         
+        def helper(course: int, visited: Set[int]) -> bool:
+            if course in prereq_to_course and prereq_to_course[course] not in visited:
+                visited.add(prereq_to_course[course])
+                if helper(prereq_to_course[course], visited):
+                    self.coursesLeft -= 1
+
+        #     for key, val in course_to_prereq.items():
+        #         if course == val and key not in visited:
+        #             # we can take this course (key) because we got the pre-req 
+        #             visited.add(key)
+        #             if helper(key, course_to_prereq, visited):
+        #                 self.coursesLeft -= 1
+        # print(startingCourses)
+        for course in startingCourses:
+            visited.add(course)
+            helper(course, visited)
+        
+        return self.coursesLeft == 0
+
+sol = Solution()
+output = sol.canFinish(3, [[1,0],[1,2],[0,1]])
+print(output)
