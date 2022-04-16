@@ -35,6 +35,14 @@ Follow up: Could you implement a solution using only O(1) extra space complexity
 
 '''
 
+from typing import List
+
+
 class Solution:
     def missingNumber(self, nums: List[int]) -> int:
-        
+        missing = set()
+        for i in range(len(nums) + 1):
+            missing.add(i)
+        for n in nums:
+            missing.remove(n)
+        return missing.pop()
