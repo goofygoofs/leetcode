@@ -32,17 +32,56 @@ Follow up: Could you implement a solution using only O(1) extra space complexity
 '''
 
 '''
+we are given an array of n distinct numbers in range [0, n+1], we're only choosing n distinct numbers in this range
+we want only missing nuimber
+can we do this using O(1) extra space and O(n) runtime?
+[0,3] 0,1,2,3
+nums = [3, 0, 1] => output = 2
+missing number is 2
+you can think of 0,1,2,3 as a hashset/hashmap and iterate through list of nums
+and crossing out the ones that are already contained in the input
+O(n) extra memory because of hashmap/set
+and O(n) time to iterate through array input
 
-'''
+followup to do in O(1) memory?
+gonna need binary properties
+XOR operation. exclusive OR operator
+(2 ^ 3)
+10 => 2
+11 => 3
+---
+01 - if they are different, will return a 1. if same returns a 0
+01 => 1
+(5 ^ 5)
+101
+101
+----
+000 (exact same)
+the order in which we XOR does not matter
+(5^5^3) since (5^5) is 0 => (0^3)
+011 => 3
+000 => 0
+----
+011 => 3
+so we are gonna take this range [0,1,2,3] and exclusive XOR it with [0,1,3]
+so this will give us only [2]
+
+we can also take the sum of each array and subtract it from each other
+this also is O(1) memory
+sum can actually be O(1) time using gauses' formula
+''' 
 
 from typing import List
 
 
 class Solution:
     def missingNumber(self, nums: List[int]) -> int:
-        missing = set()
-        for i in range(len(nums) + 1):
-            missing.add(i)
-        for n in nums:
-            missing.remove(n)
-        return missing.pop()
+        # after subtracting from the loops below, will have missing number
+        res = len(nums)
+
+        for i in range(len(nums)):
+            # we want to add it then subtract the i'th from num
+            # because we gonna subtract the sum of the nums list anyways
+            # this will give us the missing number
+            res += (i - nums[i])
+        return res
