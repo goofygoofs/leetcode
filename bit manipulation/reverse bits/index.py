@@ -29,9 +29,21 @@ Follow up: If this function is called many times, how would you optimize it?
 '''
 
 '''
-
+reverse the binary integer and return the binary representation of that
 '''
-
+from collections import deque
 class Solution:
     def reverseBits(self, n: int) -> int:
-        
+        queue = deque()
+        # skip first 2 because it will be represented as 0b in python
+        # appendleft to queue to create reversed order
+        for i in range(2, len(bin(n))):
+            queue.appendleft(bin(n)[i])
+        # join array
+        output = "".join(queue)
+        # change it back to binary
+        return int(output, 2)
+
+sol = Solution()
+output = sol.reverseBits(43261596)
+print(output)
