@@ -38,4 +38,9 @@ Follow up: If this function is called many times, how would you optimize it?
 
 class Solution:
     def hammingWeight(self, n: int) -> int:
-        
+        count1 = 0
+        strN = str(n)
+        for i in range(len(strN)):
+            if strN[i] == '1':
+                count1 += 1
+        return count1
