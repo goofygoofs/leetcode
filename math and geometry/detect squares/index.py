@@ -42,19 +42,58 @@ point.length == 2
 At most 3000 calls in total will be made to add and count.
 '''
 
-from typing import List
+'''
+count() => any point on the x OR y axis
+    then look for cooresponding point on y OR x axis
+dictionary:
+count point
+{
+    (3,10): 1
+}
+x-y
+{
+    3: [10]
+}
+y-x
+{
+    10: [3]
+}
+count => 1*1*1
+question => (11, 10) count on (11,10)?
 
+diagonal cannot be the same point itself
+
+O(1) time for add O(n) for count
+
+O(n) space for dict and list
+'''
+
+from typing import List
+from collections import defaultdict
 
 class DetectSquares:
 
     def __init__(self):
-        
+        self.ptsCount = defaultdict(int)
+        self.pts = []
 
     def add(self, point: List[int]) -> None:
-        
+        x, y = point
+        self.ptsCount[(x, y)] += 1
+        self.pts.append(point)
 
     def count(self, point: List[int]) -> int:
-        
+        # O(n) time
+        res = 0
+        px, py, = point
+        for x, y in self.pts:
+            if (abs(py - y) != abs(px - x)) or x == px or y == py: # does diagonal equal? can't be the same spot
+                continue 
+            # diagonal exists
+            res += self.ptsCount[(x,py)] * self.ptsCount[(px, y)]
+        return res
+
+
 
 
 # Your DetectSquares object will be instantiated and called as such:
