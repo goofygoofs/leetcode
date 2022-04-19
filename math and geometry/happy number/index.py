@@ -50,6 +50,11 @@ use that for next iteration
 
 O(l) l is length of digits
 O(l) for the set
+
+can create another function for sumOfSquares
+
+can mod it by 10 for the last digit
+can divide by 10 to remove last digit (double divide to floor it so we have no decimals)
 """
 
 
@@ -57,20 +62,26 @@ class Solution:
     def isHappy(self, n: int) -> bool:
         seen = set()
         currNum = n
+        
+        def sumOfSquares(n: int) -> int:
+            output = 0
+            # mod will give last digit
+            while n:
+                digit = n % 10
+                output += digit * digit
+                n = n // 10
+            return output
 
         while currNum not in seen:
             seen.add(currNum)
             if currNum == 1:
                 return True
 
-            strN = str(currNum)
-            tmp = 0
-            for strI in strN:
-                tmp += int(strI) * int(strI)
-            currNum = tmp
+            currNum = sumOfSquares(currNum)
         return False
+    
 
 
-# sol = Solution()
-# output = sol.isHappy(19)
-# print(output)
+sol = Solution()
+output = sol.isHappy(19)
+print(output)
