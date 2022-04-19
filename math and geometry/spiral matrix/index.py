@@ -46,37 +46,48 @@ if you initialize set with tuple in it, it will be different, always add to set 
 
 '''
 
+'''
+can do with O(1) space using left and right boundaries instead of a set
+update boundaries whenever we complete an entire row or column. the matrix gets smaller
+when reverse, sure you take the reverse -1 and the ending -1 to include the initial number
+
+'''
+
 from typing import List, Tuple
 
 
 class Solution:
     def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
-        row = len(matrix)
-        col = len(matrix[0])
-        order = [(0, 1), (1, 0), (-1, 0), (0, -1)] # right, down, up, left
-        self.timesNotRotated = 0 # keep track of how many times we did not rotate, if 4, we are done
-        self.index = 0 # keeps self.index for order
-        self.coordinate = (0, 0)
-        visited = set()
-        visited.add(self.coordinate)
-        output = [matrix[0][0]]
+        res = []
+        left, right = 0, len(matrix[0]) # column boundaries
+        top, bottom = 0, len(matrix) # row boundaries
 
-        def helper() -> None:
-            while (self.coordinate[0] + order[self.index][0], self.coordinate[1] + order[self.index][1]) not in visited \
-                and ((self.index in (0,3) and self.coordinate[1] + order[self.index][1] >= 0 and self.coordinate[1] + order[self.index][1] < col) \
-                or (self.index in (1,2) and self.coordinate[0] + order[self.index][0] >= 0 and self.coordinate[0] + order[self.index][0] < row)):
-                
-                self.coordinate = (self.coordinate[0] + order[self.index][0], self.coordinate[1] + order[self.index][1])
-                visited.add(self.coordinate)
-                output.append(matrix[self.coordinate[0]][self.coordinate[1]])
-                self.timesNotRotated = 0
-        while self.timesNotRotated != 4:
-            helper()
-            self.index += 1
-            if self.index > 3:
-                self.index = 0
-            self.timesNotRotated += 1
-        return output
+        while left < right and top < bottom:
+            # get every i in the top row
+            for i in range(left, right):
+                res.append(matrix[top][i])
+            top += 1
+
+            # get every i in the right col
+            for i in range(top, bottom):
+                res.append(matrix[i][right - 1])
+            right -= 1
+
+            # catches cases if single row or single col
+            if not (left < right and top < bottom):
+                break
+            
+            # get every i in the bottom row
+            for i in range(right - 1, left - 1, -1):
+                res.append(matrix[bottom - 1][i])
+            bottom -= 1
+
+            # get every i in the left row
+            for i in range(bottom - 1, top - 1, -1):
+                res.append(matrix[i][left])
+            left += 1
+        return res
+
 
 sol = Solution()
 output = sol.spiralOrder([[1,2,3,4],[5,6,7,8],[9,10,11,12]])
