@@ -42,6 +42,9 @@ point.length == 2
 At most 3000 calls in total will be made to add and count.
 '''
 
+from typing import List
+
+
 class DetectSquares:
 
     def __init__(self):
