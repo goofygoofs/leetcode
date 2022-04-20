@@ -35,7 +35,25 @@ Constraints:
 '''
 
 '''
+start at index 0 or 1 in array 
+[10, 15, 20]
+if i start at 15, i climb 2 steps to reach the top
+if i start at 10, I climb 1 or 2 steps, it will be higher than 15
 
+[1,100,1,1,1,100,1,1,100,1]
+ -     -   -     - -     - -
+
+ [6, 105, 5, 5, 4, 102, 3, 2, 100, 1] 
+min (index 0, 1)
+initialize array of len(cost) with 0's
+what is the min cost to get to this step?
+
+should we get reversed or forward?
+let's go reverse
+pointer at the end
+
+O(n) time where n is length of cost
+O(n) space for the array
 '''
 
 from typing import List
@@ -43,4 +61,15 @@ from typing import List
 
 class Solution:
     def minCostClimbingStairs(self, cost: List[int]) -> int:
+        # base case
+        if len(cost) == 2:
+            return min(cost)
+        
+        # 3 or more, we can use our function
+        dp = [0] * len(cost)
+        # setting the 2 initial from the back
+        dp[len(cost)-1], dp[len(cost)-2] = cost[len(cost)-1], cost[len(cost)-2]
+        for i in range(len(cost)-3, -1, -1):
+            dp[i] = min(cost[i] + dp[i+1], cost[i] + dp[i+2])
+        return min(dp[0], dp[1])
         
