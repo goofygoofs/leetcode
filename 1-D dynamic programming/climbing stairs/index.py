@@ -62,6 +62,25 @@ reasoning ?
 '''
 
 '''
+at every point we have 2 decisions to make, take 1 step or 2 steps
+if we have 2 4's we are repeating the same thing with the decision. ie
+2 + 2 = 4 . 3 + 1 = 4
+we have 2 decisions each for 4, but they both are the same. 1 or 2 steps.
+why are we repeating the same question for these subtrees?
+we already know the answer is 2 so we don't need to do the same work again
+
+memoization
+dynamic programming
+start at the bottom and work the way up
+
+
+time - O(n) linear
+
+DP = [0,0,0,0,0]
+DP = [5,3,2,1,1]
+because say at position 2, you can take 1 step or 2 step which lands you at position 3 or position 4
+position 3 has 2 possible ways and position 4 is 1 possible way
+2 + 1 = 3 possible ways for position 2
 
 '''
 
