@@ -29,7 +29,17 @@ Constraints:
 '''
 
 '''
+the front and back of the array are circle (connected), so cannot rob both front and back
+[2,3,2]
+[0,0,0]
+if it's 3 or below, rob max(arr)
 
+[1,2,3,4]
+[1,2,3,6]
+[1,3,1,3,1,3,5]
+[1,3,1,6,4,9,11]
+
+look at previous 2 (skipping most adjacent)
 '''
 
 from typing import List
@@ -37,4 +47,23 @@ from typing import List
 
 class Solution:
     def rob(self, nums: List[int]) -> int:
+        if len(nums) < 4:
+            return max(nums)
         
+        dp = [0] * len(nums)
+        # max(nums[2], nums[2]+nums[0]) fixes case for length 4 
+        dp[0],dp[1],dp[2] = nums[0],nums[1],nums[2]
+
+        for i in range(2, len(nums)):
+            # edge case if we only use index 0 and 2
+            if i == 2:
+                dp[i] = dp[i-2] + nums[i]
+                continue
+            if i == len(nums) - 1:
+                if i % 2 == 0: # odd number so last house has conditions on whether or not to use first home
+                    dp[i] = max(dp[i-3] + nums[i], dp[i-2]) # can't use last house or use 3rd from last with last house
+                    break
+
+            dp[i] = max(dp[i-3] + nums[i], dp[i-2] + nums[i])
+        
+        return max(dp[-2], dp[-1])
