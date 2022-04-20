@@ -42,28 +42,29 @@ if it's 3 or below, rob max(arr)
 look at previous 2 (skipping most adjacent)
 '''
 
+'''
+catch - house are arrange in a circle
+first value is adjacent to the last value
+maximum value is last one or current + prevprev
+
+call helper from [1:len(arr)] and [:len(arr)-1], since we are doing it by max = (rob1+n, rob2) 
+'''
+
 from typing import List
 
 
 class Solution:
     def rob(self, nums: List[int]) -> int:
-        if len(nums) < 4:
-            return max(nums)
         
-        dp = [0] * len(nums)
-        # max(nums[2], nums[2]+nums[0]) fixes case for length 4 
-        dp[0],dp[1],dp[2] = nums[0],nums[1],nums[2]
+        def helper(nums: List[int]) -> int:
+            rob1, rob2 = 0, 0
 
-        for i in range(2, len(nums)):
-            # edge case if we only use index 0 and 2
-            if i == 2:
-                dp[i] = dp[i-2] + nums[i]
-                continue
-            if i == len(nums) - 1:
-                if i % 2 == 0: # odd number so last house has conditions on whether or not to use first home
-                    dp[i] = max(dp[i-3] + nums[i], dp[i-2]) # can't use last house or use 3rd from last with last house
-                    break
-
-            dp[i] = max(dp[i-3] + nums[i], dp[i-2] + nums[i])
+            for n in nums:
+                newRob = max(rob1 + n, rob2)
+                rob1 = rob2
+                rob2 = newRob
+            return rob2
         
-        return max(dp[-2], dp[-1])
+        # edge cases. skip the first house, skip the last house. and also if only has 1 house
+        return max(nums[0], helper(nums[1:]), helper(nums[:-1])) 
+
