@@ -89,23 +89,82 @@ digits besides 0, we gonna add 1
 while iterating we don't add 0's
 """
 
+"""
+how many different ways can we take string of integers and decode it to characters
+we are given map of A->1...Z->26
+"12" = 1(A) and 2(B) or 12(L)
+problem comes from double digits like 10
+2 different decisions with 10
+there's a few different edge cases like "06"
+"0" is not in our input
+any string starting with "0" is invalid
+    1   2   1
+any integer by itself except 0 can be taken
+|       |
+1       12
+| |     
+2 21
+|
+1
+count: 3
+
+first digit 1 , we can take [0-9]
+first digit 2, we can take [0-6]
+if we take 2 decisions at every node, it would be 2^n
+how can we do better?
+if we take 1 by itself and consider this is just going to be one way to decode it
+then we're asking how many different ways can we decode the remaining of the string 
+the sub problem over here we're asking
+how many different ways can we decode 21 when we take the first two characters 12 then we're asking
+how many different ways can we decode the string 1. that's how the sub problem works
+the sub problem is just going to be some portion of the string you know 
+to solve this problem how many ways can we decode this we have to solve the sub problem how many ways
+can we decode everything excep the beginning
+so basically you know how many different ways can we cache it 
+we gonna have an index i and dimension of our cache is going to be n
+and that's going to be time complexity
+O(n) time
+O(n) space for cache
+
+can be solved without a cache so O(1) memory
+to compute we only need to look at the 2 values that come after it
+dp[i] = dp[i+1] + dp[i+2]
+we don't need a full array just 2 values
+
+O(n) memory cache
+if i in dp cache, return dp[i]
+set res = dfs(i+1)
+if in bounds for 1 [0-9] or 2[0-6]
+    res += dfs(i+2)
+dp[i] = res
+return res
+"""
 
 class Solution:
     def numDecodings(self, s: str) -> int:
-        if s[0] == "0":
-            return 0
-        output = 1
-        for i in range(len(s)):            
-            if i == 0: # skip first
-                continue
-            if s[i] == "0" and s[i-1] not in ("1", "2"):
+        # O(n) time and space solution
+        # initialize cache. base case to return 1 for entire string
+        dp = {len(s): 1}
+        def dfs(i: int) -> None:
+            print('i', i)
+            if i in dp:
+                # already been cached or i is in the last position in the string
+                return dp[i]
+            # if not end of str we gotta check what character it is
+            if s[i] == "0":
                 return 0
-            if s[i] != "0" and s[i-1] in ("1"):
-                output += 1
-            if s[i] not in ("0", "7", "8", "9") and s[i-1] in ("2"):
-                output += 1
-        return output
+            # between 1 - 9
+            res = dfs(i + 1)
+            print(dp, "i", i)
+            if (i + 1 < len(s) and (s[i] == "1" \
+                or s[i] == "2" and s[i+1] in "0123456")): # if starts with "1" we know we can make a double digit value
+                # if good value for 2 in [0-6]
+                # if we do have a second character after this one
+                res += dfs(i + 2)
+            dp[i] = res
+            return res
+        return dfs(0)
 
 sol = Solution()
-output = sol.numDecodings("12")
+output = sol.numDecodings("121")
 print(output)
