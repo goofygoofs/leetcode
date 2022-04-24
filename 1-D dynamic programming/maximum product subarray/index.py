@@ -48,6 +48,24 @@ O(n^2) time
 '''
 
 '''
+if we have positive numbers,
+no matter what the highest number would keep increasing to the right
+Q: how about all negatives?
+negative consecutively, the sign is alternating
+if we want to find the max prod subarray we need to keep track of the min
+[-1,-2,-3]
+for -1,-2 the max product subarray is 2 (-1*-2) and min is -2 (just -2)
+2|-2
+max|min
+-3 * 2 = -6 (min)
+-3 * -2 = 6 (max)
+ 1 is a neutral value so it won't kill the product subarray
+
+[2,3,0,4]
+curMax = 6
+curMin = 0
+
+res variable keeps track of previous contiguous subarray in case of 0's
 '''
 
 from typing import List
@@ -55,14 +73,18 @@ from typing import List
 
 class Solution:
     def maxProduct(self, nums: List[int]) -> int:
-        dp = [1] * len(nums)
+        # O(n) / O(1) : Time / Memory
+        res = max(nums)
+        curMin, curMax = 1, 1 # beacuse 1 is a neutral value
 
-        for i in range(len(nums)):
-            product = nums[i]
-            dp[i] = product
-            if i + 1 < len(nums):
-                for j in range(i+1, len(nums)):
-                    product *= nums[j]
-                    dp[i] = max(dp[i], product)
-            
-        return max(dp)
+        for n in nums:
+            tmp = curMax * n
+            curMax = max(n * curMax, n * curMin, n)
+            curMin = min(tmp, n * curMin, n)
+            print('currMax', curMax, 'curMin', curMin)
+            res = max(res, curMax)
+        return res
+
+sol = Solution()
+output = sol.maxProduct([2,3,0,4])
+print(output)
