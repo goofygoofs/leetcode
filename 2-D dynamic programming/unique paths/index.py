@@ -28,9 +28,25 @@ Constraints:
 '''
 
 '''
-
+dfs, set (don't think we need)
+2 choices, down or right
+O(2^(m*n)) time
+until we reach 0,0
 '''
 
 class Solution:
     def uniquePaths(self, m: int, n: int) -> int:
-        
+        self.count = 0
+        self.row = m
+        self.col = n
+        def helper(m: int, n: int) -> None:
+            # go down and right
+            if m + 1 in range(0, self.row):
+                helper(m+1, n)
+            if n + 1 in range(0, self.col):
+                helper(m, n+1)
+            if m == self.row - 1 and n == self.col - 1:
+                self.count += 1
+
+        helper(0, 0)
+        return self.count    
