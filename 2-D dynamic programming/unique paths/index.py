@@ -34,19 +34,38 @@ O(2^(m*n)) time
 until we reach 0,0
 '''
 
+'''
+how many unique path to get to itself (at the bottom right) = 1
+all values out of bounds are 0
+value of all bottom row is 1
+amount of unique paths res at any space is equal to D + R (because if we store it in cache we dont have to run again because we know
+the amount of unique paths there  )
+28  21  15  10  6   3   1 0                       
+7   6   5   4   3   2   1 0
+1   1   1   1   1   1   1 0
+0   0   0   0   0   0   
+
+create dp row and calculate for node is right + down
+for i
+    create new row
+    for j 
+        update node value
+    update row = new row
+time - O(m*n)
+space - O(n) for row array
+'''
+
 class Solution:
     def uniquePaths(self, m: int, n: int) -> int:
-        self.count = 0
-        self.row = m
-        self.col = n
-        def helper(m: int, n: int) -> None:
-            # go down and right
-            if m + 1 in range(0, self.row):
-                helper(m+1, n)
-            if n + 1 in range(0, self.col):
-                helper(m, n+1)
-            if m == self.row - 1 and n == self.col - 1:
-                self.count += 1
+        row = [1] * n # since we know bottom row is all 1's
+        for i in range(m - 1): # skip last row since we know it's all 0's
+            newRow = [1] * n
+            for j in range(n-2, -1, -1): # we know entire last col is 1, so we skip it
+                newRow[j] = newRow[j + 1] + row[j] # newRow(curr row) on it's right side and the space directly down
+            print(newRow)
+            row = newRow
+        return row[0]
 
-        helper(0, 0)
-        return self.count    
+sol = Solution()
+output = sol.uniquePaths(3, 7)
+print(output)
