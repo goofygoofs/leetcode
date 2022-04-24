@@ -46,29 +46,79 @@ O(n^2)
 O(n) stack 
 '''
 
+'''
+unbounded knapsack problem
+can't change order and call it a different combination
+c^n => c is # of coins and n is amount we want to sum up to
+m * n is best time complexity we can do
+
+            0
+        |       |   |
+        1       2   5
+        | | |    (how about this path can't chose 1's or previous values) (unique combinations)
+        2 1 1
+        | | |
+        2 1 1
+          | |
+          1 1
+          | |
+          1 2
+          |
+          1
+we are going to maintain a pointer so we are not not allowed to choose an index less than it
+memoization
+m^n - m is # of coins we have and n is the total amount (height of the tree)
+dfs(i, amount) if amount > 5(target), we stop
+m * n = total possible number of ways is m*n called
+if we cache, we don't have to repeat same work
+time O(m*n)
+space O(m*n)
+
+optimized dp soln 
+space O(n) 
+
+dp soln is more optimized than recursive memoization sooln
+                amount
+            5   4   3   2   1   0 (how many ways can we sum up to 0 with coins [1,2,5] is 1 way (0 coins))
+coin    1                   1   1
+        2                   0   1
+        5                   0   1    
+gotta have entire 2d grid in memory 
+
+O(n) memory
+
+                amount
+            5   4   3   2   1   0 
+coin    1   4   3   2   2   1   1        (add right and down to get spot)                  
+        2   1   1   0   1   0   1        (as we go up we can look 1 down to move up the amount of possible ways)           
+        5   1   0   0   0   0   1
+when we look down we don't need to look mujltiple spots down, that's the key to O(n) memory
+we still may need to look mujltiple spots to the right
+''' 
+
 from typing import List
 
 
 class Solution:
     def change(self, amount: int, coins: List[int]) -> int:
-        if amount == 0:
-            return 1
-        output = set()
+        # O(n) memory
+        # O(n*m) time
+        dp = [0] * (amount + 1)
+        dp[0] = 1
+        # bottom up dp
+        for i in range(len(coins)-1,-1,-1): # iterating through coins backwards
+            # print('dp', dp)
+            nextDP = [0] * (amount + 1)
+            nextDP[0] = 1
 
-        def dfs(i: int, amountLeft: int, coinUsed: List[int]) -> None:
-            if amountLeft == 0:
-                coinUsed.sort()
-                # change to Tuple because we cant add list to set because they are mutable
-                # tuples are unmmutable
-                output.add(tuple(coinUsed))
-                return
-            for j in range(i, len(coins)): # not i+1 because we can re-use the same coin
-                if amountLeft >= coins[j]:
-                    copyCoinUsed = coinUsed.copy() # new array so it doesn't interfere with other dfs'
-                    copyCoinUsed.append(coins[j])
-                    dfs(j, amountLeft - coins[j], copyCoinUsed)
+            for a in range(1, amount + 1): # iterating through 1->amount (since we've calculated for 0 already)
+                nextDP[a] = dp[a]
+                if a - coins[i] >= 0: # only when the amountLeft can fit into that coin
+                    # print('i', i, 'a', a, 'nextdp[a]', nextDP[a], 'coins[i]', coins[i], 'nextDP[a-coins[i]]', nextDP[a-coins[i]])
+                    nextDP[a] += nextDP[a - coins[i]] # take the bottom number + all the way to the right// or right next it it depedning on the coin
+            # print('nextDP', nextDP)
+            dp = nextDP
+        return dp[amount]
 
-        
-        for i in range(len(coins)):
-            dfs(i, amount - coins[i], [coins[i]])
-        return len(output)
+sol = Solution()
+output = sol.change(5, [1,2,5])
