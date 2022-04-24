@@ -27,7 +27,27 @@ The product of any prefix or suffix of nums is guaranteed to fit in a 32-bit int
 '''
 
 '''
+product = multiplication
+can have negatives
+base cases: 0, negatives
+O(n) time  
+O(1) space (using input array)
 
+going through and updating each value iwth the maximum at that index so far
+
+[2,3,-2,4]
+    [2,6,-2,4]
+[-2,2,3,-2]
+    [-2,2,6,-2]
+
+brute force
+-2,-4,-12,24
+...
+24,...
+O(n^2) time
+'''
+
+'''
 '''
 
 from typing import List
@@ -35,4 +55,14 @@ from typing import List
 
 class Solution:
     def maxProduct(self, nums: List[int]) -> int:
-        
+        dp = [1] * len(nums)
+
+        for i in range(len(nums)):
+            product = nums[i]
+            dp[i] = product
+            if i + 1 < len(nums):
+                for j in range(i+1, len(nums)):
+                    product *= nums[j]
+                    dp[i] = max(dp[i], product)
+            
+        return max(dp)
