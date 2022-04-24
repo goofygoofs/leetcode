@@ -22,7 +22,14 @@ Constraints:
 '''
 
 '''
+1 array and patition it into 2 subsets that have equal sums
 
+sort => increment left and right poitner
+[1,5,5,6,11]
+        L      
+     6
+     L<R
+Q: do we have to use entire array? probably yes
 '''
 
 from typing import List
@@ -30,4 +37,24 @@ from typing import List
 
 class Solution:
     def canPartition(self, nums: List[int]) -> bool:
+        if len(nums) == 1:
+            return False
+        nums.sort()
+        l = 0
+        r = len(nums)-1
+        ltotal = nums[l]
+        rtotal = nums[r]
         
+        while l < r-1:
+            if ltotal <= rtotal:
+                l += 1
+                ltotal += nums[l]
+            elif ltotal > rtotal:
+                r -= 1
+                rtotal += nums[r]
+        print(ltotal, rtotal)
+        return ltotal == rtotal            
+
+sol = Solution()
+output = sol.canPartition([1,5,11,5])
+print(output)
