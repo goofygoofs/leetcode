@@ -41,38 +41,67 @@ cat(s)->
  
 '''
 
+'''
+brute force? check first char, then first 2 chars ... until we find first matching word in our wordDict
+Q: now what do we do when we find a word?
+clearly we have a sub problem we found a matching word for this portion but now we want to know can we break up the rest of this string
+with words from our dictionary? this is our subproblem
+O(n^2) for trying every possible prefix
+we can also check every word in our dictionary if it matches for example the first word is "leet"
+it matchs so there's only 4 chars left and do the same thing
+does leet match "code"? no. does "code" match "code"? yes
+instead of check every possible prefix, we check every possible prefix
+this is O(n * m) n is potentially every single character of s * m (which is number of words in wordDict)
+they say max size of worddict is less than size of s, so this is more efficient
+s = "neetcode" wordDict = ["neet", "leet", "code"]
+i = 0
+|       |       |
+neet    leet    code
+|
+i=4
+|       |       |
+neet    leet    code
+                | i = 8
+                return True
+
+example for cache
+i = 5 
+dp[5] = False
+so we don't have to do it again
+
+for dp solution
+
+dp[8] = True (end of string)
+dp[7,6,5] = False
+dp[4] = True (code)
+dp[3,2,1] = False
+dp[0] = True (neet) =>  dp[0 + len(dp4) ] = True
+
+the True from the last position (len + 1) carries our True over
+we just update dp[i] = dp[i+len(w)]
+O(n * m) n is len of s and m is len of wordDict
+O(n) space for dp array
+'''
+
 from typing import List
-
-class Trie:
-    def __init__(self) -> None:
-        self.children = {}
-        self.isWord = False
-    
-    def add(self, word: str) -> None:
-        root = self.children
-        for char in word:
-            if char not in root:
-                root[char] = Trie()
-            root = root[char]
-        root.isWord = True
-
 
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        # build Trie
-        self.trie = Trie()
-        for word in wordDict:
-            self.trie.add(word)
+        dp = [False] * (len(s) + 1) # +1 for our base case
+        dp[len(s)] = True # last positioin is false
         
-        def helper(s: str, trie: Trie) -> bool:
-            if not s:
-                return True
-            char = s[0]
-            if trie.isWord:
-                return helper(s[1:], self.trie[char])
-            if char not in trie.children:
-                return False
-            if helper(s[1:], trie[char]):
-                return True
+        for i in range(len(s)-1, -1, -1):
+            for w in wordDict:
+                # if starting at position i, the string s has enough characters
+                # for w to be compared to it
+                # if the substring is exactly equal to the word in wordDict
+                if (i + len(w)) <= len(s) and s[i:i+len(w)] == w:
+                    dp[i] = dp[i + len(w)]
+                # if we found our word, we cant stop looking at other words in wordDict
+                if dp[i]:
+                    break
+        return dp[0]
 
-        return helper(s, self.trie)
+sol = Solution()
+output = sol.wordBreak("neetcode", ["neet", "leet", "code"])
+print(output)
