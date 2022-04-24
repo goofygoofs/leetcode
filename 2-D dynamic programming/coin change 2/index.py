@@ -38,7 +38,12 @@ All the values of coins are unique.
 '''
 
 '''
+dfs if total - coins[i] >= 0
+2 + 2 + 1 vs 2 + 1 + 2? or even 2< + ->2 + 1
+sort answer before adding to set?
 
+O(n^2)
+O(n) stack 
 '''
 
 from typing import List
@@ -46,4 +51,24 @@ from typing import List
 
 class Solution:
     def change(self, amount: int, coins: List[int]) -> int:
+        if amount == 0:
+            return 1
+        output = set()
+
+        def dfs(i: int, amountLeft: int, coinUsed: List[int]) -> None:
+            if amountLeft == 0:
+                coinUsed.sort()
+                # change to Tuple because we cant add list to set because they are mutable
+                # tuples are unmmutable
+                output.add(tuple(coinUsed))
+                return
+            for j in range(i, len(coins)): # not i+1 because we can re-use the same coin
+                if amountLeft >= coins[j]:
+                    copyCoinUsed = coinUsed.copy() # new array so it doesn't interfere with other dfs'
+                    copyCoinUsed.append(coins[j])
+                    dfs(j, amountLeft - coins[j], copyCoinUsed)
+
         
+        for i in range(len(coins)):
+            dfs(i, amount - coins[i], [coins[i]])
+        return len(output)
