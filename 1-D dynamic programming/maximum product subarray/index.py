@@ -66,6 +66,8 @@ curMax = 6
 curMin = 0
 
 res variable keeps track of previous contiguous subarray in case of 0's
+O(n) time
+O(1) space
 '''
 
 from typing import List
