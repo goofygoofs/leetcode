@@ -45,29 +45,17 @@ remember to use price when calculating for higher rightValue since rightValue wa
 from typing import List
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        if len(prices) == 0:
-            return 0
-        maxProfit = 0
-        leftPointer = 0
-        rightPointer = 0
+        l, r = 0, 1
+        maxP = 0
 
-        for i, price in enumerate(prices):
-            leftValue = prices[leftPointer]
-            rightValue = prices[rightPointer]
-            # print('price', price, 'LEFT', leftValue, 'RIGHT', rightValue)
-
-            # check if pointer lower or higher
-            if price < leftValue:
-                if rightPointer > leftPointer: # check if we already bought before and could have sold before, before buying at a lower price later
-                    maxProfit = self.calculateMaxProfit(maxProfit, rightValue - leftValue)
-                leftPointer = i
-            if price > rightValue or price > leftValue:
-                rightPointer = i
-                maxProfit = self.calculateMaxProfit(maxProfit, price - leftValue)
-        return maxProfit
-    
-    def calculateMaxProfit(self, currMaxProfit: int, newMaxProfit: int) -> int:
-        return max(currMaxProfit, newMaxProfit)
+        while r < len(prices):
+            if prices[l] < prices[r]:
+                profit = prices[r] - prices[l]
+                maxP = max(maxP, profit)
+            else:
+                l = r
+            r += 1
+        return maxP
 
 sol = Solution()
 
