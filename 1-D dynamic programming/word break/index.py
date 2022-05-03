@@ -79,8 +79,6 @@ dp[0] = True (neet) =>  dp[0 + len(dp4) ] = True
 
 the True from the last position (len + 1) carries our True over
 we just update dp[i] = dp[i+len(w)]
-O(n * m) n is len of s and m is len of wordDict
-O(n) space for dp array
 '''
 
 from typing import List
@@ -95,13 +93,11 @@ class Solution:
                 # if starting at position i, the string s has enough characters
                 # for w to be compared to it
                 # if the substring is exactly equal to the word in wordDict
-                if (i + len(w)) <= len(s) and s[i:i+len(w)] == w:
+                # print(i + len(w))
+                if s[i:i+len(w)] == w:
                     dp[i] = dp[i + len(w)]
                 # if we found our word, we cant stop looking at other words in wordDict
                 if dp[i]:
                     break
         return dp[0]
 
-sol = Solution()
-output = sol.wordBreak("neetcode", ["neet", "leet", "code"])
-print(output)
