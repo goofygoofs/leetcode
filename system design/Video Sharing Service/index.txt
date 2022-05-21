@@ -1,0 +1,75 @@
+1. Let's start with the customer. And what I think is the simpler case of watching a video,
+instead of uploading one. They want to watch a video from their PC, phone, or TV. At some 
+point they will be presented with a video they want to watch. When that happens, a call
+to your web servers will happen that will return any metadata needed to display along
+with the video. As well as the link to the video stream itself.
+
+2. What sort of metadata is involved? The name, description, thumbnail images, who made it,
+ads attached to it. Anything the client might need to display. 
+
+3. That implies there is a database of video metadata somewhere, populated when people create
+videos. This will be horizontally partitioned distributed database, and it can be a simple
+key value store, like BigTable or something. This is just entertainment, so it doesn'table
+need strict ACID compliance and stuff like that.
+
+4. The client will get all that metadata back to display along with the stream to the
+client side video player will display. Where does that video come from? I assume you want 
+to avoid buffering at all costs so you'll want to serve that video from as physically close to
+the clients as possible, presumably using a CDN. Now the CDN has to get its videos from
+somewhere, so I imagine there's a master copy of every transcoded video stored in your own
+cloud as well. We're talking about ludicrous amounts of storage here for billions of videos.
+So this needs to be something really scalable, like Cloud Storage.
+
+5. All we need is a simple object store where a video URL points to the streaming video data.
+You will have more than one copy of that video data for each video. The client will probably
+have some sort of streaming capability and that will need to instantly switch between different
+resolutions and maybe even different compression formats depeneding on the client platform.
+So part of the key would includ the desired resolution and format of the video as well.
+It's not just billions of videos but billions of videos encoded many different ways and
+duplicated out to edge locations around the world on CDNs. 
+
+6. CDNs are not cheap. Can you think of ways to reduce the cost of this system. Do we always
+need to use a CDN? If you're willing to trade off the user experience to save money.
+For videos that aren't popular, you could return a video stream, that's hosted from your own
+servers instead of to a CDN to save some cash.
+
+7. Have you heard of a concept called the Long Tail. It means that a long tail of niche interests
+actually make up a large portion of the things that are consumed. That implies that a lot of
+video views are to videos that aren't popular strictly speaking and we ended up not using
+the CDN too much. I bet a vast majority of videos currently stored aren't watched any more,
+and storing those in the CDN would just be a waste.
+
+8. Any ideas on how to be more clever when choosing whether to host a given video on a CDN?
+Maybe it's not just popularity but timeliness that matters, it can be a machnine learning
+model that tries to predict whether a video is likely to be viewed today and pushes it to the
+CDN if so. A neural network that might predict the likelihood of a video being watched today.
+
+9. Any other thoughts on how to refind our CDN usage? I'm sure locatino is one of those features.
+It makes sense to publish a video to some CDN endpoints but not others. Maybe CDN regions
+would work better. So Japanese-language videos might be hosted on the CDN in Japan, but not
+in the US where not a lot of people speak Japanese. Those wouldn't be hard-coded but Hopefully
+picked up by our machine learning model.
+
+10. What happens when you upload a new video? A user goes to upload a new video as part of that 
+they enter metadata for that video like its title and description. That gets dumped right
+into the metadata data store. That is not a single database host, it is a NoSQL distributed
+key value store like DynamoDB. At the same time, the user uploads their original MP4 
+in full resolution. Assuming our resources for transcoding video are finite, we'll probably
+want a message queue for transcoding requests. As soon as the raw video finishes being uploaded
+into some temporary data store. A message gets queued with the locatino of that raw video,
+the transcoding fleet, which can be hundreds of servers that just transcode video in parallel.
+Picks up the next request in the queue and removes it. Amazon SQS would work. Once it finishes
+transcoding into all the various formats and resolutions needed, those transcoded variants 
+are stored in the same distributed object store that we talked about that gets used for video
+playback.
+
+11. Let's think of edge cases. What happens if a user navigates to a video that hasn't been 
+transcoded yet? The metadata would have some sort of ready to watch flag or something. We
+wouldnt surface it until we knew the transcoding was done. Maybe there's another message 
+queue that feeds it to your search and browse systems when it's done transcoding.
+
+12. The actual fleet of servers behind the API for uploading video. There is a bunch of them
+behind a load balancer and they are all stateless so that works out fine. Also the transcoded
+video may / or not get pushed out to CDN as we discussed. The decision will be stored in the 
+video metadata so really that model is what decides transcoding is complete as only
+it knows where the video should be served from.
