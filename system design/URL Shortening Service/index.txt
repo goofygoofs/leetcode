@@ -1,0 +1,82 @@
+1
+We need to let people add new URLs to the system, so basically they would provide
+their long URL and optionally a userID if they wanted the ability to come back 
+and edit it later
+
+2
+I'm assuming there is some sor tof user authentication system being used here
+for security, and it's not really just a matter of passing any UserID as part
+of the query. Do you want me to design the user login system as well?
+
+3
+OK, so that would return some sort of status code indicating success or not, along
+with a short URL that was generated for the redirect
+
+4.
+So what would happen if somebody else already shorted the same URL earlier who
+owns edits to it in that case?
+
+5.
+We could just generate another short URL in that case and let multiple people 
+have their own mappings to the same long URL. 
+
+6. My original thought was to just convert the URL to a base 36 encoding, so
+every long URL gets some sequential ID number in our system, and we convert that
+ID number to base 36, where zero to 25 are represented by A->Z and twenty six
+to thirty five by zero to nine.
+
+7. So we could just have the same long URLs with different IDs, and that works out.
+That's better than using hashing function since the same URL would result in a hash
+collision that we would have to deal with.
+
+8. So similiarly, we'd have an API for posting a vanity URL where the user specifies
+what it redirects to. This requires the user ID since we don't want people abusing
+this. It just returns a status which might fail if the vanity URL they want has
+already been taken. Then registered users can update the URL for a redirect by 
+just providing the previous long URL and the one they want to change the link to
+
+9. They can also delete a given mapping. Again, you'll need to be a registered
+user to ensure that you're looking up a mapping that you created in the first place.
+It will give you back the short URL or failure status, if you try to look up a 
+URL that you don't create that you don't own.
+
+10. And finally, the main thing, the actual redirection, when people visit a 
+shortened URL, we need to issue a redirect. So in practice we'll just be running
+a website that does nothing but Issue 301 redirect in response to GET requests
+to short URLs on whatever our domain is.
+
+11. So really, all of these APIs could just be restful APIs served by the same fleet.
+The requests to create new URLs would just have POST actions. Update requests 
+would be a PATCH. Deletion would be DELETE. GET could be used for both displaying
+existing mappsing and for performing the actual redirects.
+
+12. Everything can be handled by the same fleet of servers. So let me draw that out.
+We start with all the clients out on the internet, on their desktop or phones or
+anything with a web browser.
+
+13. We'll use some sort of a load balancer to distribute requests to a fleet of
+application servers, which handle all the APIs that we just talked about, assuming
+the service is rolled out globally.
+
+14. We'll need to do some sort of DNS trick to geo route requests to servers in 
+appropriate region.
+
+15. I'm assuming we have capacity spread out between regions, data centers and
+racks in such a way that we have redundancy in the event a rack or data center 
+goes down.
+
+16. Every request we talked about will require one or more database accesses, so
+we'll probably want something scalable on the database side. Any noSQL sort of
+solution should do eventual consistency is probably OK for what we're doing.
+I think if we need to make tradeoffs, it should probably be that dynamoDB,
+whatever is economical.
+
+17. But we want to cache it with redis whatever we're familiar with. Hitting disk
+for every request would be a very bad idea.
+
+18. The URL mappings aren't going to be changing much, if at all, so they can
+be cached for a very long time.
+
+19. For the data schema, all we need is an ID, which would be the primary key
+and the short URL created by the base 36 encoding. Then the long URL and maps to
+the user ID.
