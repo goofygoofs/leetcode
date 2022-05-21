@@ -1,0 +1,49 @@
+1. Let's start by talking about the algorithm. Now given that we wan to surface new trends
+quickly, we want to weigh recent purchases much more heavily than older ones. Some sort of
+exponential decay where T is the time elapsed since the purchase was made shoud accomplish
+that. Even when the data is sparse, we have to go back further in time. Lambda is the decay
+rate. It lets us tweak how much recenecy counts in the algorithm and we can experiment
+with differentvalues to see what customers respond to best.
+
+2. Let's move on to sketching out the system. You have some sort of repository of purchase
+information and we need to tap into whatever that is. It must be a massive amount of info,
+but there must be some sort of data warehouse or data lake you can query.
+
+3. How would you store and query that? Even if you have some massive data warehouse, the 
+queries we need to run for this might bring it to its knees. We're basically asking it to 
+retrieve every purcahse ever, broken down by category, and if that's the case, we might
+want to have our own replica of that data warehouse just to isolate the impact that our
+system has. If I were to start from scractch, I might go more of a data lake approach,
+where teh data that we need is stored in S3. and partitioned by category in our case.
+We coudl throw something like Athena at it to run SQL queries on a massive scale.
+
+4. Now that I know where the data is, I need a big offline job that re-computes the top
+seller a few times a day. Analyzing that much data, over so many different categories, 
+we need a system that scales well. Apache spark can work, which lets us distribute the 
+processing across a whole cluster and with redundancy built in. It also gives us off
+the shelf monitoring and scheduling. With expoential decay things, we cant do this with 
+straight up SQL queries at least not easily. I think the flexibility Spark gives you is worth 
+the hassle of maintaining a cluster for it. 
+
+5. Tell me more about what this Spark job does exactly. It will need to extract every purchase
+going back to some upper limit for adequate coverage in each category. All we need are
+the item IDs, the category of the item and when it was purcahsed. We don't nee dpersonal info,
+about who bought what, just when it was bought. The Spark job will group it all by category
+and for each category go throguh each purchase, adding up some score for each item after
+applying expoential time decay to each purchase. When we're done, we just sort each 
+category by the total score of each item and write out the results to some top sellers data
+store.
+
+6. Can you tell me more about that data store? We probably care about the top 100 items or so
+per category. There are probably not a million product categories so we could probably fit
+all that into a single server like a MySQL instance with a standby ready to go if it fails.
+
+7. So the problem is how many reads that database will take from teh website. It could be
+thousands of requests per second. So we can have a caching service between the database 
+and web servers so Redis. 
+
+8. That works when the cache is warm right? Yeah the top sellers database will get hammered
+when the cache first starts up. So something more scalable for the top sellers database
+might be desirable. It's just key value data really, the list of top item IDS for given
+category ID. So any NoSQL sort of data store like dynamoDB could work and maintenance isn't
+really a problem.
