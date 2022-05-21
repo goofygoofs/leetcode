@@ -1,0 +1,90 @@
+1. So we'll need a customer table and a restaurant table for sure. We'll need to
+tie them together so each customer and restaurant will need some unique ID 
+associated with them.
+
+2. What might we need to know about a customer? Certainly thei rname, their contact
+info, maybe some info to help them find their favorite restaurants that are close
+to them. So we'll need their location as well. We'll also need to store their
+login credentials, but this would probably be stored in a more secure system or
+using some single sign on system and not here.
+
+3. Now for the restaurant, we also need its name, address, and contact info.
+We also need to know its layout so we can match up reservation requests to available
+tables. The application we build will have to have some fairly complex logic for 
+assigning reservations to tables. Maybe even taking into account the possibility of
+moving tables together to accomodate large groups. We also need to make some assumptions
+about how long it takes for a dining party to finish their meal and to clear the 
+table for the next reservation. Maybe it ends up being a function of the party size
+or time of day. I want to keep some tables aside to have a walk-in customer so
+we should at least let the restaurant specify how much capacity they want to hold
+back for walk-ins.
+
+4. Finally we need a reservation table, that ties it all together. The app will have
+to use its own logic to assign reservation requests for a given customer, 
+restaurant in time. So somewhere we'll have a table of reservations partitioned by
+restaurant ID's so we can quickly look up reservations for a given restaurant.
+
+5. Is there a reason you're going with a normalized data representation instead
+of a de-normalized one? You'll probably already have the customer ID and
+restaurant ID on the client. By the time you navigate to the point where
+you want to create a new reservation. So I think it's simpler to just retrieve the
+info on restaurants and clients as needed by their own hits to the database,
+or maybe in the cache in front of the database. That way we don't waste any space.
+And we don't have to deal with the problem of udpating everything in some huge 
+de-normalized table, everytime a customer changes their phone number or something.
+If while testing we find there is some complex join operation going on, and it's a 
+huge performance bottleneck, we could revisit that then. But my instinct here is to
+start simple and only add the complexity of de-normalization if it's needed later.
+
+6. What info is associated with a reservation? Obviously the customer and restaurant
+it is for, the party size and the time. We also want a space for notes to the 
+restaurant, like dietary restrictions, etc.
+
+7. Let's move on to desiging a larger system here. We have a bunch of clients
+that represent our diners and they're running an app or something that needs to 
+issue service requests over HTTP over the internet. Now since we have a large 
+number of diners, we need to horizontally scale the servers that process these
+requests. The act of placing a reservation or retrieving info about a diner or
+restaurant seems atomic and stateless. So that shouldn't pose a problem here.
+We just have APIs for requesting a reservation and retrieving metadata to display
+about users and restaurants. There also needs to be some API for securely logging
+in, creating an account and stuff like that. Ideally these servers will be hosted
+across different racks, data centers and regions and geo routed whenever possible,
+that would maximize availability.
+
+8. The application logic for assigning reservations to time slots will live in the
+servers that talk to this database. Although I'm drawing it as a single giant bottleneck
+this is really some horizontally scale database system to ensure it can handle
+high loads and high availability.
+
+9. We'll probably want to send text messages to people reminding them of their
+reservations. We'll have some sort of a fail over set up on that as well. Maybe
+just with a cold standby, ready to go. We could put it behind a load balancer just 
+to ensure that we have redundancy all the time. At least a couple of servers in 
+different data centers handling the SMS part.
+
+10. How do you go about a specific technology for the database? Well part of it comes
+down to what tools your staff is already familiar with. If you're an AWS shop, then
+I think DynamoDB would fit the bill nicely. But let's think about CAP theorem.
+You said earlier, we care about availability and speed. So that implies
+partition tolerance for scalability. So that means we can maybe give up a little 
+on consistency. So something like Cassandra that has eventual consistency in 
+exchange for not having a single master server might be a reasonable choice.
+
+11. But I think I would push back on those requirements. Consistency probably is
+important for this application. It just isn't something we talked about yet.
+We definitely don't want two customers ending up with the same reservation slot.
+In practice, even the database that trade off avaiability are still highly 
+avaiabile, if you throw enough secondary servers. So MongoDB or DynamoDB is probably
+a fine choice.
+
+12. What about caching? Do we need it? How can we further improve the performance of
+the system? Well we don't really have a lot of static content in this system,
+so something like a CDN probably for fast hosting of the CSS, Javascript, images
+on the client side. We talked about hosting the app servers across different regions
+and geo routing to them. That will cut down on some latency. We probably would 
+have some sort of cache for the database queries though since customer and restaurant
+data isn't likely to change very often. We can have something like Redis sitting on top
+of those queries inside the app server. The cache/database can be distributed across
+regions as well since it doesn't really do good to geo route to servers if all those
+servers have to talk to one region for the data.
