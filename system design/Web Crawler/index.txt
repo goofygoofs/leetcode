@@ -1,0 +1,92 @@
+1. Let's start thinking about it from an algorithmic standpoint. Basically webpages are
+vertices on a directed graph right. The links between them are the edges of the graph.
+So fundamentally this is a graph traversal problem. What kind of traversal? The choices 
+are BFS or DFS. The number of links on any one page are pretty finite, so that would
+represent breadth, and the depth of the internet is pretty much infinite. So I think that
+BFS is the only real solution here.
+
+2. Remind me how BFS works. So starting at some page, you go through every link on the page
+and kick off the processing of each link. And then each link on the child nodes are processed
+working your way across the graph from left to right, as opposed to DFS, where we would 
+follow one path all the way to the end and then back up. The problem is that following any
+path all the way to the end would take pretty much forever on the internet. So BFS is
+usually the way to go.
+
+3. Let's make the scale to billions of web pages. We can start with something high level,
+and then we can start refining it. So we need to start with a list of URLs to crawl. We 
+wpould seed this and nowadays people can submit sites via Google webmaster tool. So there
+are some process to directly add new URLs that have no inbound links at all yet to this 
+list of URLs to crawl.
+
+4. That could be a pretty big list. It's not going to fit in memory on a single host. We'll
+probably need to hash each URLs that comes in and dispatch it to a list on one of many servers
+to scale that up. 
+
+5. So we'll have another distributed system of some sort that actually downloads all of those
+URLs and stores their contents into some truly massive distributed storage system. I guess
+some sort of simple object store will do where the key is just the URL and the value is the 
+stuff that was downloaded, so something like S3 would work.
+
+6. Next we need to extract all the links within that page and crawl them in turn. There needs
+to be some way of normalizing those URLs. There's HTTP vs HTTPS, relative links, trailing slashes,
+all sorts of edge cases. But in the end we need some sort of canonical URL taht we can submit
+to the crawler. There are also links we might want to explicitly exclude like known malware
+sites or prohibited content.
+
+7. If a URL makes it all the way through this, it goes back intot the distributed list of stuff
+that needs to be crawled, this will be a first in first out queue sort of a thing. A big
+distributed linked list would do find. Why a linked list and not an array? Well these
+URLs are strings and we don't really know ahead of time how much memory a certain number
+of URLs will take. Using arrays means we have to pre-allocate space, but we can't know
+how many elements will fit on a given server ahead of time.
+
+8. What if the server goes up in flames? Will that part of the internet be gone? That might
+be okay. The next time you run the crawler, it would pick it up. And simplicity and lower costs
+there might be a reasonable trade off to make.
+
+9. Let's say it isn't. Too many people will freak out if their new webpage isn't crawled quickly.
+How would you solve that? We need some sort of distributed persistent list. I guess you
+can back it on disk in a distributed database, and maybe have hot standbys for each server,
+so if one goes down, you have another one ready. As long as they're in different data centers,
+the risk should be low.
+
+10. How do you avoid processing copies of the same page that are under different URLs?
+We could compute some sort of hash. We store every hash value that we've encountered somewhere.
+So before we move from the download to the URL extractor, we see if that page has hash 
+value has been seen before. If not, we add it, then we move on. If so, we'd have to compare
+the two pages character by character to ensure it's not just some random hash collision and
+they really are identical. So we'd also have to store the URL that the hash value came from,
+so we can retrieve that if need be.
+
+11. Now we have a similar problem with duplicate URLs don't we? If many pages are linekd to 
+the same URL, we don't want to crawl that URL every time it's linked. The URL filter will also 
+check against that to ensure that we haven't already submitted that URL to the crawler.
+That can include a hashmap or something in addition to the queue to let us check against
+the URLs that have been processed already.
+
+12. How to avoid bringing sites down by crawling them too fast. A lot of servers can't
+keep up with us if we just hit them with a requeest for every page on the site all at once. 
+We can have some sort of time delay baked in between calls. That's going to be running on 
+a huge fleet of servers, each running a bunch of threads to download pages and hash them
+and store them in parallel. So maybe we hash URLs to download to individual servers like
+we did fort the queue. And we do this hashed on the domain names so that all the download
+requests for a given site end up on the same server. That server could maintain a thread
+for each site that runs in parallel with the other sites that it's taking care of with a 
+time delay between each hit on a given site.
+
+13. The page downloader has some fixed number of download threads with a time delay between
+each hit that the queue feeds requests into. The queue makes sure requests from the same
+site end up in the same download thread.
+
+14. Where would storing images or client side rendering fit in potentially? We could
+extract images at the same time that we do URL extraction. We treat them like another URL 
+to be crawled. So the page downloader knows how to recognize an image URL and how to retrieve
+and store images as well as HTML.
+
+15. And client side rendering? I think that would go into the URL extraction piece.
+instead of scanning HTML for URLs, we actually render the HTML in a browser and see if
+any new URLs are created in the process. That would mean building a whole other fleet of
+page renderers and a way to queue them up.
+
+16. We didnt talk about dynamic content or sites that require you to log in or malicious sites 
+that trap crawlers in an infinite loop. There are all sorts of edge cases.
